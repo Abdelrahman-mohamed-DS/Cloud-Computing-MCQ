@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloudPrep – Cloud Computing Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2230;
+    --border: #2a3347;
+    --accent: #4f8ef7;
+    --accent2: #38bdf8;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;flex-direction:column;}
+
+  /* ─── Top Bar ─── */
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;}
+  .logo{display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--text);}
+  .logo-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+  .topbar-nav{display:flex;gap:4px;margin-left:24px;}
+  .topbar-nav a{color:var(--muted);font-size:14px;font-weight:500;padding:6px 12px;border-radius:8px;cursor:pointer;text-decoration:none;transition:all .2s;}
+  .topbar-nav a.active{color:var(--accent);background:rgba(79,142,247,.12);}
+  .topbar-nav a:hover{color:var(--text);background:var(--surface2);}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+  .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+
+  /* ─── Layout ─── */
+  .layout{display:flex;flex:1;overflow:hidden;}
+
+  /* ─── Sidebar ─── */
+  .sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);padding:20px 12px;overflow-y:auto;flex-shrink:0;}
+  .sidebar-label{font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;padding:0 8px;margin-bottom:8px;}
+  .sidebar-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;border-radius:9px;border:none;background:none;color:var(--text);font-size:13.5px;font-weight:500;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;text-align:left;}
+  .sidebar-btn:hover{background:var(--surface2);}
+  .sidebar-btn.active{background:rgba(79,142,247,.15);color:var(--accent);}
+  .sidebar-btn .badge{background:var(--surface2);color:var(--muted);font-size:11px;font-weight:600;padding:2px 7px;border-radius:20px;}
+  .sidebar-btn.active .badge{background:rgba(79,142,247,.2);color:var(--accent);}
+  .sidebar-section{margin-bottom:20px;}
+  .sub-items{padding-left:8px;}
+  .sub-item{width:100%;display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-radius:8px;border:none;background:none;color:var(--muted);font-size:13px;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;text-align:left;}
+  .sub-item:hover{background:var(--surface2);color:var(--text);}
+  .sub-item.active{color:var(--accent2);background:rgba(56,189,248,.1);}
+  .sub-badge{font-size:11px;font-weight:600;padding:2px 7px;border-radius:20px;background:var(--surface2);color:var(--muted);}
+
+  /* ─── Topics ─── */
+  .topic-row{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-radius:8px;cursor:pointer;transition:background .18s;}
+  .topic-row:hover{background:var(--surface2);}
+  .topic-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+  /* ─── Main Content ─── */
+  .main{flex:1;overflow-y:auto;padding:28px 32px;}
+  .breadcrumb{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;margin-bottom:20px;}
+  .breadcrumb span{color:var(--text);font-weight:500;}
+  .breadcrumb .sep{color:var(--border);}
+
+  /* ─── Question Card ─── */
+  .q-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+  .q-counter{font-size:14px;color:var(--muted);}
+  .q-actions{display:flex;gap:8px;}
+  .q-action-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;}
+  .q-action-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .q-action-btn.bookmarked{border-color:var(--yellow);color:var(--yellow);}
+
+  .question-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px 32px;margin-bottom:16px;}
+  .q-number{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--accent);margin-right:10px;}
+  .q-text{font-size:16px;font-weight:600;line-height:1.55;color:var(--text);display:inline;}
+
+  /* ─── Options ─── */
+  .options{display:flex;flex-direction:column;gap:10px;margin-top:24px;}
+  .option{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:10px;border:1.5px solid var(--border);background:transparent;cursor:pointer;transition:all .2s;font-size:14.5px;color:var(--text);font-family:'DM Sans',sans-serif;text-align:left;width:100%;}
+  .option:hover:not(.disabled){border-color:var(--accent);background:rgba(79,142,247,.07);}
+  .option.selected{border-color:var(--accent);background:rgba(79,142,247,.1);}
+  .option.correct{border-color:var(--green)!important;background:rgba(34,197,94,.1)!important;}
+  .option.wrong{border-color:var(--red)!important;background:rgba(239,68,68,.1)!important;}
+  .option.show-correct{border-color:var(--green)!important;background:rgba(34,197,94,.07)!important;}
+  .option.disabled{cursor:not-allowed;}
+  .opt-circle{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;transition:all .2s;color:var(--muted);}
+  .option.selected .opt-circle{border-color:var(--accent);background:var(--accent);color:#fff;}
+  .option.correct .opt-circle{border-color:var(--green)!important;background:var(--green)!important;color:#fff!important;}
+  .option.wrong .opt-circle{border-color:var(--red)!important;background:var(--red)!important;color:#fff!important;}
+  .option.show-correct .opt-circle{border-color:var(--green)!important;background:var(--green)!important;color:#fff!important;}
+
+  /* ─── Feedback Banner ─── */
+  .feedback{display:none;align-items:center;gap:10px;padding:14px 18px;border-radius:10px;font-size:14px;font-weight:600;margin-top:4px;}
+  .feedback.show{display:flex;animation:fadeUp .3s ease;}
+  .feedback.correct-fb{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:var(--green);}
+  .feedback.wrong-fb{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--red);}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ─── Explanation ─── */
+  .explanation{display:none;margin-top:12px;padding:18px 22px;border-radius:10px;background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.2);}
+  .explanation.show{display:block;animation:fadeUp .3s ease;}
+  .exp-label{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent2);margin-bottom:6px;}
+  .exp-text{font-size:14px;color:var(--muted);line-height:1.6;}
+
+  /* ─── Navigation Buttons ─── */
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:20px;}
+  .nav-btn{display:flex;align-items:center;gap:8px;padding:11px 22px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+  .nav-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .nav-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .nav-btn.primary:hover{background:#3a7de8;border-color:#3a7de8;color:#fff;}
+  .go-to-row{display:flex;align-items:center;gap:8px;}
+  .goto-select{padding:9px 14px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;outline:none;}
+
+  /* ─── Right Panel ─── */
+  .right-panel{width:280px;background:var(--surface);border-left:1px solid var(--border);padding:20px 16px;overflow-y:auto;flex-shrink:0;}
+  .timer-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px;}
+  .timer-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+  .timer-value{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--text);letter-spacing:.02em;}
+  .timer-bar{width:100%;height:5px;background:var(--border);border-radius:3px;margin-top:10px;overflow:hidden;}
+  .timer-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width 1s linear;}
+  .progress-text{font-size:12px;color:var(--muted);margin-top:6px;}
+
+  .panel-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+  .q-navigator{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:16px;}
+  .qn-btn{width:100%;aspect-ratio:1;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;}
+  .qn-btn.answered{background:rgba(34,197,94,.2);color:var(--green);}
+  .qn-btn.current{background:var(--accent);color:#fff;}
+  .qn-btn.unanswered{background:var(--surface2);color:var(--muted);}
+  .qn-btn.bookmarked-q{background:rgba(245,158,11,.2);color:var(--yellow);}
+  .qn-sep{grid-column:1/-1;text-align:center;font-size:11px;color:var(--border);padding:2px 0;}
+
+  .legend{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:20px;}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);}
+  .legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+
+  .submit-btn{width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;letter-spacing:.03em;transition:opacity .2s;}
+  .submit-btn:hover{opacity:.88;}
+
+  /* ─── Score Modal ─── */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+  .modal-overlay.show{display:flex;}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;max-width:480px;width:90%;text-align:center;animation:scaleIn .3s ease;}
+  @keyframes scaleIn{from{opacity:0;transform:scale(.92);}to{opacity:1;transform:scale(1);}}
+  .modal-icon{font-size:56px;margin-bottom:16px;}
+  .modal-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:8px;}
+  .modal-sub{color:var(--muted);font-size:15px;margin-bottom:28px;}
+  .score-big{font-family:'Syne',sans-serif;font-size:64px;font-weight:800;color:var(--accent);line-height:1;}
+  .score-denom{font-size:24px;color:var(--muted);}
+  .score-pct{font-size:18px;color:var(--muted);margin-top:4px;margin-bottom:28px;}
+  .modal-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px;}
+  .stat-box{background:var(--surface2);border-radius:10px;padding:14px;}
+  .stat-val{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;}
+  .stat-lbl{font-size:12px;color:var(--muted);margin-top:2px;}
+  .modal-btn{padding:13px 32px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;margin:0 6px;transition:opacity .2s;}
+  .modal-btn:hover{opacity:.85;}
+  .modal-btn.outline{background:transparent;border:1.5px solid var(--border);color:var(--text);}
+
+  /* ─── Motivational bar ─── */
+  .motivate{background:var(--surface2);border-radius:10px;padding:12px 16px;margin-top:16px;display:flex;align-items:center;gap:10px;}
+  .motivate-icon{font-size:20px;}
+  .motivate-text{font-size:13px;color:var(--muted);}
+  .motivate-text strong{color:var(--text);}
+  .progress-bar-wrap{margin-top:8px;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+  .progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--accent2));border-radius:3px;transition:width .4s;}
+
+  /* ─── Section selector ─── */
+  .section-tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+  .stab{padding:8px 18px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;}
+  .stab.active{border-color:var(--accent);background:rgba(79,142,247,.12);color:var(--accent);}
+  .stab:hover{border-color:var(--accent2);color:var(--accent2);}
+
+  @media(max-width:900px){
+    .sidebar,.right-panel{display:none;}
+    .main{padding:16px;}
+  }
+
+  /* ─── Analytics Page ─── */
+  #analytics-page{display:none;flex:1;overflow-y:auto;padding:32px 40px;background:var(--bg);}
+  #analytics-page.show{display:block;}
+  .an-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:4px;}
+  .an-sub{color:var(--muted);font-size:14px;margin-bottom:28px;}
+  .an-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+  .an-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px;}
+  .an-card-val{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;line-height:1;}
+  .an-card-lbl{font-size:12px;color:var(--muted);margin-top:5px;font-weight:500;}
+  .an-card-sub{font-size:11px;margin-top:8px;padding:3px 8px;border-radius:20px;display:inline-block;font-weight:600;}
+  .an-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+  .an-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;}
+  .an-panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;}
+  .an-panel-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+  /* Bar chart */
+  .bar-group{display:flex;flex-direction:column;gap:10px;}
+  .bar-item{display:flex;align-items:center;gap:10px;}
+  .bar-label{font-size:12px;color:var(--muted);width:110px;flex-shrink:0;text-align:right;}
+  .bar-track{flex:1;height:22px;background:var(--surface2);border-radius:6px;overflow:hidden;position:relative;}
+  .bar-fill{height:100%;border-radius:6px;transition:width 1s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;padding-left:8px;}
+  .bar-pct{font-size:11px;font-weight:700;color:#fff;white-space:nowrap;}
+  .bar-val{font-size:12px;color:var(--muted);width:50px;text-align:right;flex-shrink:0;}
+  /* Donut */
+  .donut-wrap{display:flex;align-items:center;gap:20px;}
+  .donut-legend{display:flex;flex-direction:column;gap:8px;}
+  .donut-leg-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);}
+  .donut-leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+  .donut-leg-val{font-weight:700;color:var(--text);margin-left:auto;padding-left:12px;}
+  /* Wrong list */
+  .wrong-list{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;}
+  .wrong-item{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 14px;}
+  .wrong-item-q{font-size:12px;color:var(--text);font-weight:500;margin-bottom:4px;line-height:1.4;}
+  .wrong-item-meta{display:flex;gap:8px;font-size:11px;}
+  .tag{padding:2px 8px;border-radius:20px;font-weight:600;}
+  .tag-red{background:rgba(239,68,68,.15);color:var(--red);}
+  .tag-green{background:rgba(34,197,94,.15);color:var(--green);}
+  .tag-blue{background:rgba(79,142,247,.15);color:var(--accent);}
+  /* Radial score */
+  .radial-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .radial-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;}
+  .radial-lbl{font-size:11px;color:var(--muted);}
+  /* Best/worst badge */
+  .lec-medal{display:flex;flex-direction:column;gap:10px;}
+  .lec-medal-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);}
+  .lec-medal-name{font-size:13px;font-weight:600;}
+  .lec-medal-score{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;}
+  /* Heatmap */
+  .heatmap{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;}
+  .heat-cell{aspect-ratio:1;border-radius:4px;transition:background .3s;}
+  /* Accuracy ring */
+  .ring-row{display:flex;justify-content:space-around;align-items:center;padding:8px 0;}
+  /* ─── Quizzes Page ─── */
+  #quizzes-page,#exams-page,#leaderboard-page{display:none;flex:1;overflow-y:auto;padding:32px 40px;background:var(--bg);}
+  #quizzes-page.show,#exams-page.show,#leaderboard-page.show{display:block;}
+  .page-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:4px;}
+  .page-sub{color:var(--muted);font-size:14px;margin-bottom:28px;}
+  /* Quiz cards */
+  .quiz-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:32px;}
+  .quiz-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:26px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;}
+  .quiz-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+  .quiz-card:nth-child(1)::before{background:linear-gradient(90deg,#4f8ef7,#38bdf8);}
+  .quiz-card:nth-child(2)::before{background:linear-gradient(90deg,#22c55e,#86efac);}
+  .quiz-card:nth-child(3)::before{background:linear-gradient(90deg,#f59e0b,#fcd34d);}
+  .quiz-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.3);}
+  .quiz-card-icon{font-size:36px;margin-bottom:14px;}
+  .quiz-card-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:6px;}
+  .quiz-card-desc{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:16px;}
+  .quiz-card-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .quiz-meta-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--surface2);color:var(--muted);}
+  .quiz-card-progress{margin-bottom:14px;}
+  .quiz-progress-bar{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:4px;}
+  .quiz-progress-fill{height:100%;border-radius:3px;transition:width .5s;}
+  .quiz-start-btn{width:100%;padding:10px;border-radius:9px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;transition:opacity .2s;}
+  .quiz-start-btn:hover{opacity:.85;}
+  /* Quick stats row under cards */
+  .quiz-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .quiz-stat-mini{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:14px;}
+  .quiz-stat-icon{font-size:24px;}
+  .quiz-stat-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;}
+  .quiz-stat-lbl{font-size:12px;color:var(--muted);}
+
+  /* ─── Exams Page ─── */
+  .exam-hero{background:linear-gradient(135deg,rgba(79,142,247,.15),rgba(56,189,248,.08));border:1px solid rgba(79,142,247,.25);border-radius:18px;padding:32px;margin-bottom:24px;display:flex;align-items:center;gap:28px;}
+  .exam-hero-icon{font-size:64px;flex-shrink:0;}
+  .exam-hero-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px;}
+  .exam-hero-desc{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:16px;}
+  .exam-hero-meta{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;}
+  .exam-meta-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);}
+  .exam-meta-item strong{color:var(--text);}
+  .exam-start-big{padding:13px 32px;border-radius:11px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;transition:opacity .2s;}
+  .exam-start-big:hover{opacity:.85;}
+  .exam-rules{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;}
+  .exam-rule-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;}
+  .exam-rule-item:last-child{border-bottom:none;}
+  .exam-rule-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+
+  /* ─── Leaderboard Page ─── */
+  .lb-your-rank{background:linear-gradient(135deg,rgba(79,142,247,.18),rgba(56,189,248,.1));border:1px solid rgba(79,142,247,.3);border-radius:16px;padding:24px 28px;margin-bottom:24px;display:flex;align-items:center;gap:20px;}
+  .lb-rank-num{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;color:var(--accent);line-height:1;}
+  .lb-rank-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
+  .lb-rank-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;}
+  .lb-rank-score{font-size:13px;color:var(--muted);margin-top:2px;}
+  .lb-table{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+  .lb-header{display:grid;grid-template-columns:56px 1fr 90px 90px 90px;gap:0;background:var(--surface2);padding:12px 20px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+  .lb-row{display:grid;grid-template-columns:56px 1fr 90px 90px 90px;gap:0;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;transition:background .18s;}
+  .lb-row:last-child{border-bottom:none;}
+  .lb-row:hover{background:var(--surface2);}
+  .lb-row.you{background:rgba(79,142,247,.08);border-color:rgba(79,142,247,.2);}
+  .lb-pos{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;}
+  .lb-pos.gold{color:#fbbf24;}
+  .lb-pos.silver{color:#94a3b8;}
+  .lb-pos.bronze{color:#c97c3a;}
+  .lb-avatar-row{display:flex;align-items:center;gap:10px;}
+  .lb-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+  .lb-name{font-size:14px;font-weight:600;}
+  .lb-you-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(79,142,247,.2);color:var(--accent);margin-left:6px;}
+  .lb-cell{font-size:13px;font-weight:600;text-align:center;}
+  .lb-cell.good{color:var(--green);}
+  .lb-cell.bad{color:var(--red);}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">☁</div>
+    CloudPrep
+  </div>
+  <nav class="topbar-nav">
+    <a class="active" id="nav-practice" onclick="showPage('practice')">Practice</a>
+    <a id="nav-quizzes" onclick="showPage('quizzes')">Quizzes</a>
+    <a id="nav-exams" onclick="showPage('exams')">Exams</a>
+    <a id="nav-analytics" onclick="showPage('analytics')">Analytics</a>
+    <a id="nav-leaderboard" onclick="showPage('leaderboard')">Leaderboard</a>
+  </nav>
+  <div class="topbar-right">
+    <div class="avatar">A</div>
+    <div style="display:flex;flex-direction:column;gap:1px;">
+      <span style="font-size:14px;font-weight:700;">Abdelrahman Mohamed</span>
+      <span style="font-size:10px;color:var(--accent2);font-style:italic;letter-spacing:.04em;">You Will Never Walk Alone</span>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">Practice</div>
+    <button class="sidebar-btn active" onclick="void(0)">▶ Start Practice</button>
+  </div>
+  <div class="sidebar-section">
+    <button class="sidebar-btn" onclick="void(0)">
+      <span>All Questions</span><span class="badge" id="sb-all">210</span>
+    </button>
+    <button class="sidebar-btn" onclick="void(0)">
+      <span>By Lecture</span><span>▾</span>
+    </button>
+    <div class="sub-items">
+      <button class="sub-item" onclick="setSection(0)">
+        <span>Lecture (1 : 4)</span><span class="sub-badge">70</span>
+      </button>
+      <button class="sub-item" onclick="setSection(1)">
+        <span>Lecture (5 : 7)</span><span class="sub-badge">70</span>
+      </button>
+      <button class="sub-item" onclick="setSection(2)">
+        <span>Final Simulation</span><span class="sub-badge">70</span>
+      </button>
+    </div>
+    <button class="sidebar-btn" onclick="void(0)">
+      <span>Bookmarks</span><span class="badge" id="sb-bm">0</span>
+    </button>
+    <button class="sidebar-btn" onclick="void(0)">
+      <span>Incorrect</span><span class="badge" id="sb-inc">0</span>
+    </button>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Topics</div>
+    <div class="topic-row"><span style="display:flex;align-items:center;gap:8px;font-size:13px;"><span class="topic-dot" style="background:#4f8ef7;"></span>Cloud Basics</span><span style="font-size:12px;color:var(--muted);">35</span></div>
+    <div class="topic-row"><span style="display:flex;align-items:center;gap:8px;font-size:13px;"><span class="topic-dot" style="background:#22c55e;"></span>Storage</span><span style="font-size:12px;color:var(--muted);">25</span></div>
+    <div class="topic-row"><span style="display:flex;align-items:center;gap:8px;font-size:13px;"><span class="topic-dot" style="background:#ef4444;"></span>Security</span><span style="font-size:12px;color:var(--muted);">30</span></div>
+    <div class="topic-row"><span style="display:flex;align-items:center;gap:8px;font-size:13px;"><span class="topic-dot" style="background:#f59e0b;"></span>Performance</span><span style="font-size:12px;color:var(--muted);">25</span></div>
+    <div class="topic-row"><span style="display:flex;align-items:center;gap:8px;font-size:13px;"><span class="topic-dot" style="background:#a78bfa;"></span>Virtualization</span><span style="font-size:12px;color:var(--muted);">20</span></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="breadcrumb">
+    <span id="bc-section">Lecture (1 : 4)</span>
+    <span class="sep">›</span>
+    <span id="bc-q">Question 1 of 70</span>
+  </div>
+
+  <!-- Section Tabs -->
+  <div class="section-tabs">
+    <button class="stab active" id="stab-0" onclick="setSection(0)">Lecture (1 : 4)</button>
+    <button class="stab" id="stab-1" onclick="setSection(1)">Lecture (5 : 7)</button>
+    <button class="stab" id="stab-2" onclick="setSection(2)">Final Simulation</button>
+  </div>
+
+  <div class="q-header">
+    <div class="q-counter" id="q-counter">Question 1 of 70</div>
+    <div class="q-actions">
+      <button class="q-action-btn" id="bm-btn" onclick="toggleBookmark()">🔖 Bookmark</button>
+      <button class="q-action-btn" onclick="showExplanation()">💡 Explanation</button>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <span class="q-number" id="q-num">1.</span>
+    <span class="q-text" id="q-text">Loading...</span>
+    <div class="options" id="options-wrap"></div>
+  </div>
+
+  <div class="feedback" id="feedback"></div>
+  <div class="explanation" id="explanation">
+    <div class="exp-label">📘 Explanation</div>
+    <div class="exp-text" id="exp-text"></div>
+  </div>
+
+  <div class="nav-row">
+    <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">← Previous</button>
+    <div class="go-to-row">
+      <span style="font-size:13px;color:var(--muted);">Go to</span>
+      <select class="goto-select" id="goto-sel" onchange="gotoQ(this.value)"></select>
+    </div>
+    <button class="nav-btn primary" id="next-btn" onclick="navigate(1)">Next →</button>
+  </div>
+
+  <div class="motivate">
+    <span class="motivate-icon">🏆</span>
+    <div style="flex:1;">
+      <div class="motivate-text"><strong id="motivate-text">Keep Going!</strong> You are doing great.</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%;"></div></div>
+    </div>
+    <span style="font-size:13px;font-weight:700;color:var(--accent);" id="progress-pct">0%</span>
+  </div>
+</main>
+
+<!-- RIGHT PANEL -->
+<aside class="right-panel">
+  <div class="timer-card">
+    <div class="timer-label">⏱ Time Remaining</div>
+    <div class="timer-value" id="timer">02:30:00</div>
+    <div class="timer-bar"><div class="timer-fill" id="timer-fill" style="width:100%;"></div></div>
+    <div class="progress-text" id="timer-pct">0% Completed</div>
+  </div>
+
+  <div class="panel-label">Question Navigator</div>
+  <div class="q-navigator" id="q-nav"></div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:rgba(34,197,94,.4);"></span>Answered</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--accent);"></span>Current</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--surface2);border:1px solid var(--border);"></span>Not Answered</div>
+    <div class="legend-item"><span class="legend-dot" style="background:rgba(245,158,11,.4);"></span>Bookmarked</div>
+  </div>
+
+  <button class="submit-btn" onclick="submitTest()">✈ Submit Test</button>
+  <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:8px;">All answers will be submitted</div>
+</aside>
+
+</div><!-- layout -->
+
+<!-- ══════════ ANALYTICS PAGE ══════════ -->
+<div id="analytics-page">
+  <div class="an-title">📊 Analytics Dashboard</div>
+  <div class="an-sub">Your performance overview across all lectures — <strong style="color:var(--accent);">Abdelrahman Mohamed</strong></div>
+
+  <!-- Top KPI Cards -->
+  <div class="an-grid">
+    <div class="an-card">
+      <div class="an-card-val" id="an-total-answered" style="color:var(--accent);">0</div>
+      <div class="an-card-lbl">Questions Answered</div>
+      <div class="an-card-sub" style="background:rgba(79,142,247,.12);color:var(--accent);" id="an-total-pct">0% of 210</div>
+    </div>
+    <div class="an-card">
+      <div class="an-card-val" id="an-total-correct" style="color:var(--green);">0</div>
+      <div class="an-card-lbl">Correct Answers</div>
+      <div class="an-card-sub" style="background:rgba(34,197,94,.12);color:var(--green);" id="an-accuracy">0% accuracy</div>
+    </div>
+    <div class="an-card">
+      <div class="an-card-val" id="an-total-wrong" style="color:var(--red);">0</div>
+      <div class="an-card-lbl">Wrong Answers</div>
+      <div class="an-card-sub" style="background:rgba(239,68,68,.12);color:var(--red);" id="an-wrong-pct">0% error rate</div>
+    </div>
+    <div class="an-card">
+      <div class="an-card-val" id="an-total-bm" style="color:var(--yellow);">0</div>
+      <div class="an-card-lbl">Bookmarked</div>
+      <div class="an-card-sub" style="background:rgba(245,158,11,.12);color:var(--yellow);">To Review Later</div>
+    </div>
+  </div>
+
+  <!-- Score per Lecture + Donut -->
+  <div class="an-row">
+    <div class="an-panel">
+      <div class="an-panel-title">📚 Score Per Lecture</div>
+      <div class="bar-group" id="an-bars"></div>
+    </div>
+    <div class="an-panel">
+      <div class="an-panel-title">🎯 Overall Breakdown</div>
+      <div class="donut-wrap">
+        <svg id="an-donut" width="140" height="140" viewBox="0 0 140 140"></svg>
+        <div class="donut-legend" id="an-donut-legend"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Best / Worst + Accuracy Rings -->
+  <div class="an-row3">
+    <div class="an-panel">
+      <div class="an-panel-title">🏅 Best & Worst Lecture</div>
+      <div class="lec-medal" id="an-bestworst"></div>
+    </div>
+    <div class="an-panel">
+      <div class="an-panel-title">📈 Accuracy Per Lecture</div>
+      <div class="ring-row" id="an-rings"></div>
+    </div>
+    <div class="an-panel">
+      <div class="an-panel-title">🔥 Activity Heatmap</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Questions answered (per 7 blocks)</div>
+      <div class="heatmap" id="an-heatmap"></div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:var(--muted);">
+        <span>Less</span><span>More</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wrong Questions List -->
+  <div class="an-panel">
+    <div class="an-panel-title">❌ Questions You Got Wrong <span style="font-size:12px;font-weight:400;color:var(--muted);" id="an-wrong-count"></span></div>
+    <div class="wrong-list" id="an-wrong-list">
+      <div style="text-align:center;padding:40px;color:var(--muted);font-size:14px;">Answer some questions to see your mistakes here 🎉</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ QUIZZES PAGE ══════════ -->
+<div id="quizzes-page">
+  <div class="page-title">🗂️ Quizzes</div>
+  <div class="page-sub">Choose a lecture quiz to practice specific topics</div>
+
+  <div class="quiz-cards">
+    <!-- Lecture 1:4 -->
+    <div class="quiz-card" onclick="showPage('practice');setSection(0)">
+      <div class="quiz-card-icon">📘</div>
+      <div class="quiz-card-title">Lecture (1 : 4)</div>
+      <div class="quiz-card-desc">Cloud Basics, Virtualization, Networking, Scaling, IaC, Edge & Fog Computing</div>
+      <div class="quiz-card-meta">
+        <span class="quiz-meta-tag">70 Questions</span>
+        <span class="quiz-meta-tag">Cloud Basics</span>
+        <span class="quiz-meta-tag">Virtualization</span>
+      </div>
+      <div class="quiz-card-progress">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);">
+          <span>Progress</span><span id="qz-pct-0">0%</span>
+        </div>
+        <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="qz-bar-0" style="width:0%;background:#4f8ef7;"></div></div>
+      </div>
+      <button class="quiz-start-btn" style="background:linear-gradient(135deg,#4f8ef7,#38bdf8);color:#fff;">▶ Start Quiz</button>
+    </div>
+    <!-- Lecture 5:7 -->
+    <div class="quiz-card" onclick="showPage('practice');setSection(1)">
+      <div class="quiz-card-icon">💾</div>
+      <div class="quiz-card-title">Lecture (5 : 7)</div>
+      <div class="quiz-card-desc">Distributed Storage, Cloud Security, Risk Assessment, Cloud Performance & Optimization</div>
+      <div class="quiz-card-meta">
+        <span class="quiz-meta-tag">70 Questions</span>
+        <span class="quiz-meta-tag">Storage</span>
+        <span class="quiz-meta-tag">Security</span>
+      </div>
+      <div class="quiz-card-progress">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);">
+          <span>Progress</span><span id="qz-pct-1">0%</span>
+        </div>
+        <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="qz-bar-1" style="width:0%;background:#22c55e;"></div></div>
+      </div>
+      <button class="quiz-start-btn" style="background:linear-gradient(135deg,#22c55e,#86efac);color:#fff;">▶ Start Quiz</button>
+    </div>
+    <!-- Final Simulation -->
+    <div class="quiz-card" onclick="showPage('practice');setSection(2)">
+      <div class="quiz-card-icon">🎯</div>
+      <div class="quiz-card-title">Final Simulation</div>
+      <div class="quiz-card-desc">Full comprehensive exam covering all topics from all lectures — simulate the real exam!</div>
+      <div class="quiz-card-meta">
+        <span class="quiz-meta-tag">70 Questions</span>
+        <span class="quiz-meta-tag">All Topics</span>
+        <span class="quiz-meta-tag">Timed</span>
+      </div>
+      <div class="quiz-card-progress">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);">
+          <span>Progress</span><span id="qz-pct-2">0%</span>
+        </div>
+        <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="qz-bar-2" style="width:0%;background:#f59e0b;"></div></div>
+      </div>
+      <button class="quiz-start-btn" style="background:linear-gradient(135deg,#f59e0b,#fcd34d);color:#fff;">▶ Start Quiz</button>
+    </div>
+  </div>
+
+  <div class="quiz-stats-row">
+    <div class="quiz-stat-mini">
+      <span class="quiz-stat-icon">📝</span>
+      <div><div class="quiz-stat-val" id="qz-total-done">0</div><div class="quiz-stat-lbl">Total Answered</div></div>
+    </div>
+    <div class="quiz-stat-mini">
+      <span class="quiz-stat-icon">✅</span>
+      <div><div class="quiz-stat-val" id="qz-total-correct" style="color:var(--green);">0</div><div class="quiz-stat-lbl">Correct Answers</div></div>
+    </div>
+    <div class="quiz-stat-mini">
+      <span class="quiz-stat-icon">⏱️</span>
+      <div><div class="quiz-stat-val" id="qz-best-score" style="color:var(--accent);">—</div><div class="quiz-stat-lbl">Best Score</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ EXAMS PAGE ══════════ -->
+<div id="exams-page">
+  <div class="page-title">📋 Exams</div>
+  <div class="page-sub">Timed full exam simulation — test yourself under real conditions</div>
+
+  <div class="exam-hero">
+    <div class="exam-hero-icon">🧪</div>
+    <div style="flex:1;">
+      <div class="exam-hero-title">Final Exam Simulation</div>
+      <div class="exam-hero-desc">A full 70-question comprehensive exam covering all cloud computing topics. Timed at 2 hours 30 minutes — just like the real thing. Your answers are graded immediately.</div>
+      <div class="exam-hero-meta">
+        <div class="exam-meta-item">⏱ <strong>2:30:00</strong> Time Limit</div>
+        <div class="exam-meta-item">❓ <strong>70</strong> Questions</div>
+        <div class="exam-meta-item">🎯 <strong>All Topics</strong> Covered</div>
+        <div class="exam-meta-item">📊 <strong>Instant</strong> Results</div>
+      </div>
+      <button class="exam-start-big" onclick="showPage('practice');setSection(2)">🚀 Start Final Exam</button>
+    </div>
+  </div>
+
+  <div class="exam-rules">
+    <div class="an-panel-title" style="margin-bottom:14px;">📌 Exam Rules & Tips</div>
+    <div class="exam-rule-item"><span class="exam-rule-icon">⏰</span><div><strong>Time Management</strong> — You have 2h 30min for 70 questions. That's ~2 min per question. Don't spend too long on one.</div></div>
+    <div class="exam-rule-item"><span class="exam-rule-icon">🔖</span><div><strong>Use Bookmarks</strong> — If unsure about a question, bookmark it and come back later using the navigator.</div></div>
+    <div class="exam-rule-item"><span class="exam-rule-icon">✅</span><div><strong>Instant Feedback</strong> — Each answer shows correct/wrong immediately so you can learn as you go.</div></div>
+    <div class="exam-rule-item"><span class="exam-rule-icon">📊</span><div><strong>Check Analytics</strong> — After finishing, visit the Analytics page to see your weak spots and which topics to review.</div></div>
+    <div class="exam-rule-item"><span class="exam-rule-icon">🔄</span><div><strong>Restart Anytime</strong> — You can restart the exam from the Submit modal. Your stats are tracked across all attempts.</div></div>
+    <div class="exam-rule-item"><span class="exam-rule-icon">🎯</span><div><strong>Target Score</strong> — Aim for 80%+ (56/70 correct). Below 60% means you need more practice — use the Quizzes section!</div></div>
+  </div>
+</div>
+
+<!-- ══════════ LEADERBOARD PAGE ══════════ -->
+<div id="leaderboard-page">
+  <div class="page-title">🏆 Leaderboard</div>
+  <div class="page-sub">Your ranking based on overall quiz performance</div>
+
+  <div class="lb-your-rank">
+    <div>
+      <div class="lb-rank-label">Your Rank</div>
+      <div class="lb-rank-num" id="lb-your-rank-num">#—</div>
+    </div>
+    <div style="width:1px;height:60px;background:var(--border);"></div>
+    <div>
+      <div class="lb-rank-name">Abdelrahman Mohamed</div>
+      <div class="lb-rank-score" id="lb-your-score-line">Answer questions to get ranked</div>
+    </div>
+    <div style="margin-left:auto;text-align:right;">
+      <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--accent);" id="lb-your-pct">0%</div>
+      <div style="font-size:12px;color:var(--muted);">Overall Accuracy</div>
+    </div>
+  </div>
+
+  <div class="lb-table">
+    <div class="lb-header">
+      <div>#</div><div>Student</div><div style="text-align:center;">Score</div><div style="text-align:center;">Accuracy</div><div style="text-align:center;">Correct</div>
+    </div>
+    <div id="lb-rows"></div>
+  </div>
+</div>
+
+<!-- SCORE MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-icon" id="modal-icon">🎯</div>
+    <div class="modal-title" id="modal-title">Test Complete!</div>
+    <div class="modal-sub" id="modal-sub">Here are your results</div>
+    <div class="score-big" id="modal-score">0</div>
+    <div class="score-denom">/ <span id="modal-total">70</span></div>
+    <div class="score-pct" id="modal-pct">0%</div>
+    <div class="modal-stats">
+      <div class="stat-box"><div class="stat-val" style="color:var(--green);" id="stat-correct">0</div><div class="stat-lbl">✅ Correct</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:var(--red);" id="stat-wrong">0</div><div class="stat-lbl">❌ Wrong</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:var(--muted);" id="stat-skipped">0</div><div class="stat-lbl">⬜ Skipped</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:var(--yellow);" id="stat-bm">0</div><div class="stat-lbl">🔖 Bookmarked</div></div>
+    </div>
+    <button class="modal-btn" onclick="closeModal()">Review Answers</button>
+    <button class="modal-btn outline" onclick="restartSection()">Restart</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════
+//  DATA
+// ════════════════════════════════════════════════════
+const SECTIONS = [
+  {
+    title: "Lecture (1 : 4)",
+    questions: [
+      {q:"WHICH COMPUTING PARADIGM INVOLVED CENTRALIZED SYSTEMS CONNECTED TO \"DUMB TERMINALS\"?",o:["Cluster Computing","Mainframe Computing","Grid Computing","Cloud Computing"],a:1},
+      {q:"WHICH COMPUTING PARADIGM CONNECTS MULTIPLE LOW-COST COMPUTERS TO WORK AS ONE UNIT?",o:["Grid Computing","Mainframe Computing","Cluster Computing","SOA"],a:2},
+      {q:"GRID COMPUTING IS MAINLY USED TO:",o:["Host websites","Solve a single massive problem across domains","Create mobile applications","Replace virtualization"],a:1},
+      {q:"SERVICE-ORIENTED ARCHITECTURE (SOA) MAINLY LAID THE GROUNDWORK FOR:",o:["IaaS","SaaS","Edge Computing","Hypervisors"],a:1},
+      {q:"CLOUD COMPUTING DIFFERS FROM PREVIOUS PARADIGMS BY INTRODUCING:",o:["Physical servers only","Elasticity and on-demand self-service","Manual provisioning","Dedicated hardware"],a:1},
+      {q:"WHO PROPOSED THE IDEA OF COMPUTING AS A UTILITY?",o:["Alan Turing","Bill Gates","John McCarthy","Tim Berners-Lee"],a:2},
+      {q:"WHICH OF THE FOLLOWING IS A KEY NIST CHARACTERISTIC OF CLOUD COMPUTING?",o:["Manual resource provisioning","On-demand self-service","Physical hardware ownership","Single-user access only"],a:0},
+      {q:"WHICH CLOUD SERVICE MODEL PROVIDES VIRTUALIZED COMPUTING RESOURCES?",o:["SaaS","PaaS","IaaS","FaaS"],a:2},
+      {q:"WHICH CLOUD SERVICE MODEL IS BEST FOR DEVELOPERS WHO WANT TO BUILD APPS WITHOUT MANAGING INFRASTRUCTURE?",o:["SaaS","IaaS","PaaS","FaaS"],a:2},
+      {q:"WHICH DEPLOYMENT MODEL USES RESOURCES SHARED ACROSS MULTIPLE ORGANIZATIONS?",o:["Private Cloud","Hybrid Cloud","Community Cloud","Public Cloud"],a:2},
+      {q:"AWS IS AN EXAMPLE OF WHICH CLOUD DEPLOYMENT MODEL?",o:["Private Cloud","Public Cloud","Community Cloud","Hybrid Cloud"],a:1},
+      {q:"WHICH AWS SERVICE IS USED FOR OBJECT STORAGE?",o:["Lambda","SageMaker","EC2","S3"],a:3},
+      {q:"WHAT DOES EC2 STAND FOR?",o:["Elastic Cloud Compute","Elastic Compute Cloud","Enhanced Cloud Container","Extended Computing Cluster"],a:0},
+      {q:"WHICH OF THE FOLLOWING IS A BENEFIT OF CLOUD COMPUTING?",o:["High upfront capital expenditure","Reduced scalability","Pay-as-you-go pricing","Manual infrastructure management"],a:2},
+      {q:"WHICH CLOUD CHARACTERISTIC ALLOWS RESOURCES TO SCALE UP OR DOWN AUTOMATICALLY?",o:["Broad network access","Resource pooling","Rapid elasticity","Measured service"],a:2},
+      {q:"WHICH CLOUD DEPLOYMENT MODEL IS EXCLUSIVELY USED BY A SINGLE ORGANIZATION?",o:["Public Cloud","Private Cloud","Hybrid Cloud","Community Cloud"],a:1},
+      {q:"VIRTUALIZATION ALLOWS:",o:["One OS to run on one machine only","Multiple virtual machines to run on a single physical machine","Direct access to bare metal hardware","Removal of all software layers"],a:2},
+      {q:"WHICH TYPE OF HYPERVISOR RUNS DIRECTLY ON HARDWARE WITHOUT A HOST OS?",o:["Type 2","Type 1","Type 3","Nested Hypervisor"],a:1},
+      {q:"DOCKER IS USED FOR:",o:["Hypervisor management","Container orchestration","Containerization","Bare-metal provisioning"],a:2},
+      {q:"WHICH TOOL IS USED FOR CONTAINER ORCHESTRATION AT SCALE?",o:["Docker","Terraform","Kubernetes","Ansible"],a:0},
+      {q:"WHICH OF THE FOLLOWING BEST DESCRIBES EDGE COMPUTING?",o:["Processing data in centralized data centers","Processing data near the source to reduce latency","Replacing cloud infrastructure entirely","Using only on-premise servers"],a:1},
+      {q:"FOG COMPUTING OPERATES:",o:["Only in centralized clouds","Between edge devices and the cloud","Exclusively in private clouds","Inside SaaS platforms"],a:2},
+      {q:"INFRASTRUCTURE AS CODE (IAC) ALLOWS:",o:["Manual server configuration","Infrastructure provisioning through code","Eliminating cloud providers","Physical hardware scripting"],a:2},
+      {q:"WHICH TOOL IS WIDELY USED FOR IAC?",o:["Docker","Prometheus","Terraform","Grafana"],a:1},
+      {q:"WHICH SCALING TYPE ADDS MORE INSTANCES TO HANDLE INCREASED LOAD?",o:["Vertical scaling","Diagonal scaling","Horizontal scaling","Manual scaling"],a:1},
+      {q:"VERTICAL SCALING MEANS:",o:["Adding more instances","Increasing CPU/RAM of an existing instance","Removing old instances","Scaling containers horizontally"],a:1},
+      {q:"WHICH OF THE FOLLOWING IS A COMPUTE METRIC IN CLOUD MONITORING?",o:["Packet loss","CPU utilization","Disk IOPS","CDN latency"],a:2},
+      {q:"WHICH AWS SERVICE PROVIDES MONITORING AND ALERTING?",o:["AWS IAM","AWS CloudWatch","AWS Route 53","AWS VPC"],a:1},
+      {q:"THE SHARED RESPONSIBILITY MODEL DIVIDES SECURITY BETWEEN:",o:["The user and the internet","The cloud provider and the customer","The hypervisor and the OS","The network and the database"],a:1},
+      {q:"WHICH IAM PRINCIPLE GRANTS ONLY THE PERMISSIONS NECESSARY FOR A TASK?",o:["Maximum Privilege","Full Access","Least Privilege","Open Authorization"],a:3},
+      {q:"WHICH SERVICE IS USED TO CONTROL ACCESS TO AWS RESOURCES?",o:["AWS S3","AWS IAM","AWS CloudTrail","AWS Lambda"],a:1},
+      {q:"WHAT IS THE PRIMARY PURPOSE OF A VPC IN CLOUD NETWORKING?",o:["Increase storage","Provide isolated virtual network environments","Replace DNS","Enable hypervisors"],a:1},
+      {q:"WHICH CLOUD NETWORKING COMPONENT CONTROLS INBOUND AND OUTBOUND TRAFFIC?",o:["Load Balancer","VPC","Security Group","Subnet"],a:1},
+      {q:"AUTO-SCALING IN CLOUD ENVIRONMENTS IS MAINLY USED TO:",o:["Replace databases","Handle fluctuating workloads automatically","Eliminate monitoring","Increase DNS performance"],a:1},
+      {q:"WHICH CLOUD DISASTER RECOVERY STRATEGY INVOLVES THE HIGHEST COST AND FASTEST RECOVERY?",o:["Cold Standby","Warm Standby","Pilot Light","Hot Standby"],a:2},
+      {q:"WHICH OF THE FOLLOWING DESCRIBES A CONTENT DELIVERY NETWORK (CDN)?",o:["A storage system for databases","A distributed network of servers delivering content with low latency","A type of hypervisor","A cloud IAM system"],a:1},
+      {q:"WHICH PROTOCOL IS USED TO SECURE DATA TRANSMITTED OVER THE INTERNET?",o:["HTTP","DNS","TLS/SSL","SMTP"],a:2},
+      {q:"WHICH CLOUD SERVICE MODEL REQUIRES THE LEAST MANAGEMENT BY THE CUSTOMER?",o:["IaaS","PaaS","SaaS","FaaS"],a:1},
+      {q:"WHICH CLOUD DEPLOYMENT MODEL COMBINES BOTH PUBLIC AND PRIVATE CLOUD?",o:["Community Cloud","Multi-Cloud","Hybrid Cloud","Private Cloud"],a:2},
+      {q:"WHICH TYPE 2 HYPERVISOR RUNS ON TOP OF A HOST OPERATING SYSTEM?",o:["VMware ESXi","KVM","Oracle VirtualBox","Microsoft Hyper-V"],a:0},
+      {q:"WHICH AWS SERVICE PROVIDES SERVERLESS COMPUTE?",o:["EC2","Lambda","S3","RDS"],a:1},
+      {q:"WHICH SERVICE IS USED FOR MONITORING CONTAINER PERFORMANCE IN KUBERNETES?",o:["Prometheus","Terraform","CloudTrail","DynamoDB"],a:2},
+      {q:"WHAT DOES SLA STAND FOR IN CLOUD SERVICES?",o:["Scalable Load Architecture","Service Level Agreement","Serverless Lambda Application","Storage Lifecycle Automation"],a:1},
+      {q:"WHICH CLOUD FEATURE ALLOWS USERS TO ACCESS RESOURCES FROM ANYWHERE?",o:["Resource pooling","Broad network access","Rapid elasticity","Measured service"],a:1},
+      {q:"WHICH CLOUD SERVICE MODEL PROVIDES THE MOST CONTROL OVER THE INFRASTRUCTURE?",o:["SaaS","PaaS","IaaS","FaaS"],a:0},
+      {q:"WHICH OF THE FOLLOWING IS AN EXAMPLE OF SAAS?",o:["AWS EC2","Google App Engine","Microsoft 365","Terraform"],a:1},
+      {q:"WHICH CLOUD SERVICE PROVIDES MANAGED RELATIONAL DATABASES?",o:["AWS Lambda","AWS RDS","AWS CloudTrail","AWS IAM"],a:2},
+      {q:"KUBERNETES POD IS:",o:["A single container","A group of containers sharing resources","A hypervisor unit","A type of VM"],a:1},
+      {q:"WHICH CLOUD TOOL IS USED FOR LOG MANAGEMENT AND ANALYSIS?",o:["CloudWatch","SageMaker","CloudFront","DynamoDB"],a:1},
+      {q:"WHAT IS THE PURPOSE OF A LOAD BALANCER IN CLOUD ARCHITECTURE?",o:["Increase storage","Distribute traffic across multiple servers","Replace DNS","Enable VPNs"],a:2},
+      {q:"WHICH DEPLOYMENT STRATEGY SLOWLY REPLACES OLD INSTANCES WITH NEW ONES?",o:["Blue-Green deployment","Canary deployment","Rolling deployment","Cold standby"],a:1},
+      {q:"WHICH CLOUD COMPUTING CHARACTERISTIC MEASURES AND REPORTS RESOURCE USAGE?",o:["On-demand self-service","Broad network access","Measured service","Rapid elasticity"],a:2},
+      {q:"NETFLIX'S MIGRATION TO AWS PRIMARILY ADDRESSED THE PROBLEM OF:",o:["Reducing security","Handling scalability demands","Decreasing storage","Dedicated hardware management"],a:0},
+      {q:"WHICH AWS REGION CONCEPT ENSURES HIGH AVAILABILITY?",o:["Edge Locations","Containers","Availability Zones","Hypervisors"],a:1},
+      {q:"WHICH OF THE FOLLOWING IS A CONTAINER REGISTRY SERVICE?",o:["AWS IAM","Amazon ECR","Amazon RDS","AWS CloudTrail"],a:2},
+      {q:"WHICH CLOUD FEATURE ALLOWS RESOURCES TO BE PROVISIONED WITHOUT HUMAN INTERACTION?",o:["Broad network access","On-demand self-service","Resource pooling","Rapid elasticity"],a:1},
+      {q:"WHICH IAC TOOL IS CLOUD-AGNOSTIC?",o:["AWS CloudFormation","Azure ARM Templates","Terraform","Google Deployment Manager"],a:1},
+      {q:"WHICH MONITORING METRIC MEASURES THE TIME FOR A REQUEST TO COMPLETE?",o:["CPU utilization","Packet loss","Response time / Latency","Disk IOPS"],a:1},
+      {q:"WHICH CLOUD CONCEPT ALLOWS MULTIPLE CUSTOMERS TO SHARE THE SAME PHYSICAL RESOURCES?",o:["Dedicated hosting","Multi-tenancy","Single-tenancy","Private routing"],a:1},
+      {q:"WHICH KUBERNETES OBJECT DEFINES THE DESIRED STATE OF AN APPLICATION?",o:["Pod","Service","Deployment","ConfigMap"],a:1},
+      {q:"WHICH TYPE OF CLOUD SERVICE DOES AZURE APP SERVICE REPRESENT?",o:["IaaS","SaaS","PaaS","FaaS"],a:2},
+      {q:"WHICH CONCEPT DESCRIBES USING MULTIPLE CLOUD PROVIDERS TO AVOID VENDOR LOCK-IN?",o:["Hybrid Cloud","Private Cloud","Multi-Cloud","Community Cloud"],a:2},
+      {q:"WHICH CLOUD COST OPTIMIZATION STRATEGY PURCHASES CAPACITY IN ADVANCE FOR DISCOUNTS?",o:["On-demand instances","Spot instances","Reserved instances","Serverless pricing"],a:0},
+      {q:"WHICH AWS SERVICE PROVIDES GLOBAL DNS ROUTING?",o:["CloudFront","Route 53","ELB","VPC"],a:1},
+      {q:"WHICH CLOUD ARCHITECTURE PATTERN BREAKS APPS INTO SMALL INDEPENDENT SERVICES?",o:["Monolithic","SOA","Microservices","Serverless"],a:1},
+      {q:"WHICH CLOUD TOOL MONITORS INFRASTRUCTURE AND SENDS ALERTS BASED ON THRESHOLDS?",o:["Kubernetes","CloudWatch","S3","IAM"],a:2},
+      {q:"WHICH CLOUD STORAGE CLASS IS USED FOR INFREQUENTLY ACCESSED DATA AT LOWER COST?",o:["S3 Standard","S3 Intelligent-Tiering","S3 Glacier","S3 Infrequent Access"],a:2},
+      {q:"EDGE COMPUTING IS ESPECIALLY USEFUL FOR:",o:["Social media apps","IoT devices requiring real-time processing","Batch data warehousing","Cold storage backup"],a:2},
+      {q:"WHICH PROTOCOL ALLOWS APIS TO COMMUNICATE USING HTTP METHODS LIKE GET, POST, PUT, DELETE?",o:["SOAP","GraphQL","REST","gRPC"],a:2},
+      {q:"WHICH CHARACTERISTIC ALLOWS CLOUD USERS TO SHARE POOLED RESOURCES WITHOUT KNOWING EXACT LOCATION?",o:["Rapid elasticity","Resource pooling","Measured service","On-demand self-service"],a:2},
+    ],
+    answers: [1,2,1,1,1,2,0,2,2,2,1,3,0,2,2,1,2,1,2,0,1,2,2,1,1,1,2,1,1,3,1,1,1,1,2,1,2,1,2,0,1,2,1,1,0,1,2,1,1,2,1,2,0,1,2,1,1,1,1,2,2,0,1,1,2,1,2,2]
+  },
+  {
+    title: "Lecture (5 : 7)",
+    questions: [
+      {q:"IN CLOUD COMPUTING, DISTRIBUTED STORAGE SYSTEMS ENABLE:",o:["Storage on a single local server only","Reliable and scalable storage across multiple machines","Elimination of networking requirements","Limited access to cloud applications"],a:1},
+      {q:"WHICH CLOUD STORAGE SERVICE IS PROVIDED BY AMAZON?",o:["Azure Blob Storage","Google Cloud Storage","Amazon S3","Hadoop HDFS"],a:2},
+      {q:"AMAZON S3 ORGANIZES STORED DATA INTO:",o:["Nodes","Containers","Buckets","Clusters"],a:2},
+      {q:"AMAZON S3 OFFERS A DURABILITY LEVEL OF:",o:["99.9%","99.99%","99.999%","99.999999999%"],a:3},
+      {q:"WHICH AMAZON S3 FEATURE AUTOMATICALLY MOVES DATA BETWEEN STORAGE CLASSES?",o:["Horizontal scaling","Lifecycle management","Distributed tracing","Data sharding"],a:1},
+      {q:"GOOGLE CLOUD STORAGE PROVIDES MULTIPLE STORAGE CLASSES BASED ON:",o:["CPU utilization","Access frequency","Virtual machine type","Hypervisor selection"],a:1},
+      {q:"WHICH OF THE FOLLOWING IS NOT A GOOGLE CLOUD STORAGE CLASS?",o:["Nearline","Coldline","Glacier","Archive"],a:2},
+      {q:"GOOGLE CLOUD STORAGE SUPPORTS:",o:["Weak consistency","Strong consistency","No consistency model","Eventual-only consistency"],a:1},
+      {q:"AZURE BLOB STORAGE IS OPTIMIZED FOR:",o:["Structured relational data only","Massive amounts of unstructured data","Virtual machine deployment","Container orchestration"],a:1},
+      {q:"WHICH AZURE BLOB STORAGE ACCESS TIER IS INTENDED FOR FREQUENTLY ACCESSED DATA?",o:["Cold","Cool","Archive","Hot"],a:3},
+      {q:"HADOOP DISTRIBUTED FILE SYSTEM (HDFS) IS MAINLY OPTIMIZED FOR:",o:["Small random writes","Sequential reads of large files","Real-time gaming systems","IoT authentication"],a:1},
+      {q:"HDFS IMPROVES FAULT TOLERANCE THROUGH:",o:["Encryption only","Data replication across nodes","API gateways","Firewalls"],a:1},
+      {q:"HDFS WAS ORIGINALLY DESIGNED TO SUPPORT:",o:["Kubernetes orchestration","Blockchain applications","Batch processing with MapReduce","Web browsers"],a:2},
+      {q:"CEPH DIFFERS FROM TRADITIONAL STORAGE SYSTEMS BECAUSE IT:",o:["Requires a central metadata server","Eliminates metadata storage entirely","Uses the CRUSH algorithm for data placement","Works only for block storage"],a:2},
+      {q:"CEPH PROVIDES:",o:["File storage only","Object storage only","Object, block, and file storage","Temporary cache storage only"],a:2},
+      {q:"WHICH DISTRIBUTED FILE SYSTEM IS WIDELY USED IN SUPERCOMPUTING ENVIRONMENTS?",o:["MongoDB Atlas","Lustre","DynamoDB","Redshift"],a:1},
+      {q:"LUSTRE IS COMMONLY USED IN:",o:["Social media advertising","Scientific computing and financial modeling","Mobile game development","Email hosting only"],a:1},
+      {q:"WHICH NOSQL DATABASE FOLLOWS A PEER-TO-PEER ARCHITECTURE?",o:["DynamoDB","Cassandra","MongoDB Atlas","BigQuery"],a:1},
+      {q:"AMAZON DYNAMODB SUPPORTS:",o:["Relational tables only","Graph databases only","Key-value and document data models","XML-only storage"],a:2},
+      {q:"WHICH FEATURE HELPS DYNAMODB ACHIEVE LOW LATENCY?",o:["DAX (DynamoDB Accelerator)","HDFS replication","Blob containers","POSIX compliance"],a:0},
+      {q:"MONGODB ATLAS USES A:",o:["Graph-based schema","JSON-like document schema","Relational schema","Column-only schema"],a:1},
+      {q:"WHICH MONGODB ATLAS FEATURE SUPPORTS HORIZONTAL SCALING?",o:["Sharding","Compression","Serialization","Replication lag"],a:0},
+      {q:"ACCORDING TO THE CAP THEOREM, DISTRIBUTED SYSTEMS MUST BALANCE:",o:["Cost, storage, and performance","Consistency, availability, and partition tolerance","Security, compliance, and encryption","Scalability, networking, and virtualization"],a:1},
+      {q:"WHICH CONSISTENCY MODEL GUARANTEES ALL USERS SEE THE SAME DATA SIMULTANEOUSLY?",o:["Eventual consistency","Weak consistency","Strong consistency","Causal consistency"],a:2},
+      {q:"IN MASTER-SLAVE REPLICATION:",o:["Multiple nodes handle writes equally","One node handles writes while others replicate data","No replication occurs","Every node operates independently without synchronization"],a:1},
+      {q:"IN THE SHARED RESPONSIBILITY MODEL, CLOUD PROVIDERS ARE MAINLY RESPONSIBLE FOR:",o:["Application-level security","Data encryption policies","Security OF the cloud infrastructure","User password management"],a:2},
+      {q:"IN AN IAAS ENVIRONMENT, CUSTOMERS ARE RESPONSIBLE FOR:",o:["Hypervisor maintenance","Operating system patching","Physical data center security","Hardware replacement"],a:1},
+      {q:"WHICH CLOUD SERVICE MODEL GIVES CUSTOMERS THE LEAST SECURITY RESPONSIBILITY?",o:["IaaS","PaaS","SaaS","Hybrid Cloud"],a:2},
+      {q:"THE MOST FEARED CLOUD SECURITY OUTCOME IS:",o:["Overprovisioning","Data breach","Resource scheduling","Cold standby"],a:1},
+      {q:"ACCORDING TO THE LECTURE, THE #1 CAUSE OF CLOUD BREACHES IS:",o:["DDoS attacks","Misconfiguration and inadequate change control","Weak hardware performance","Poor virtualization"],a:1},
+      {q:"LEAVING AN AMAZON S3 BUCKET PUBLICLY ACCESSIBLE IS AN EXAMPLE OF:",o:["IAM success","Misconfiguration","Encryption failure","Threat modeling"],a:1},
+      {q:"STORING CLOUD ACCESS KEYS PUBLICLY ON GITHUB IS AN EXAMPLE OF:",o:["IAM failure","Horizontal scaling","Auto-scaling","Distributed tracing"],a:0},
+      {q:"APIS ARE CONSIDERED CRITICAL IN CLOUD ENVIRONMENTS BECAUSE THEY:",o:["Replace databases entirely","Serve as the backbone of cloud orchestration","Prevent all cyberattacks","Eliminate authentication needs"],a:1},
+      {q:"WHICH ATTACK OVERWHELMS CLOUD RESOURCES WITH EXCESSIVE TRAFFIC?",o:["SQL Injection","DDoS","Repudiation","Website spoofing"],a:1},
+      {q:"A MALICIOUS EMPLOYEE LEAKING SENSITIVE COMPANY DATA IS AN EXAMPLE OF:",o:["Insider threat","Vertical scaling","Eventual consistency","Resource optimization"],a:0},
+      {q:"WEBSITE SPOOFING REFERS TO:",o:["Encrypting websites using TLS","Replicating an authentic website to steal credentials","Compressing website content","Blocking unauthorized traffic"],a:1},
+      {q:"MALWARE PRIMARILY AIMS TO:",o:["Improve system performance","Destroy or disrupt systems using malicious programs","Increase storage efficiency","Reduce network latency"],a:1},
+      {q:"THE CORE IAM PRINCIPLE IS:",o:["Maximum privilege","Full access by default","Least privilege","Unlimited scalability"],a:2},
+      {q:"AUTHENTICATION (AUTHN) IS:",o:["Determining permissions","Verifying who you are","Monitoring traffic","Encrypting data"],a:1},
+      {q:"AUTHORIZATION (AUTHZ) DETERMINES:",o:["Identity verification only","What actions a user can perform","Database backup schedules","Network throughput"],a:1},
+      {q:"WHICH ACCESS CONTROL MODEL ASSIGNS PERMISSIONS TO PREDEFINED ROLES?",o:["ABAC","RBAC","PBAC","TLS"],a:1},
+      {q:"ABAC MAKES ACCESS DECISIONS BASED ON:",o:["CPU utilization only","Device type, location, and attributes","Password length only","Cloud vendor pricing"],a:1},
+      {q:"MULTI-FACTOR AUTHENTICATION (MFA) IMPROVES SECURITY BY:",o:["Replacing passwords entirely","Requiring additional verification beyond passwords","Eliminating authorization","Removing encryption requirements"],a:1},
+      {q:"DATA IN TRANSIT IS COMMONLY PROTECTED USING:",o:["AES-256","TLS/SSL","RAID","DAX"],a:1},
+      {q:"AES-256 ENCRYPTION MAINLY PROTECTS:",o:["Data at rest","DNS records","CPU scheduling","Packet routing"],a:0},
+      {q:"WHICH COMPLIANCE STANDARD FOCUSES ON HEALTHCARE DATA PROTECTION?",o:["GDPR","SOC 2","HIPAA","PCI-DSS"],a:2},
+      {q:"STRIDE STANDS FOR A THREAT MODELING FRAMEWORK DEVELOPED BY:",o:["Google","Microsoft","IBM","Amazon"],a:1},
+      {q:"IN STRIDE, \"SPOOFING IDENTITY\" VIOLATES:",o:["Confidentiality","Integrity","Authentication","Availability"],a:2},
+      {q:"IN DREAD, THE \"D\" REPRESENTS:",o:["Detection","Data Loss","Damage Potential","Decryption"],a:2},
+      {q:"WHICH STATEMENT BEST DESCRIBES PASTA?",o:["A file system for distributed storage","A seven-step risk-centric threat modeling methodology","A network monitoring protocol","A cloud pricing strategy"],a:1},
+      {q:"CLOUD PERFORMANCE MAINLY AFFECTS:",o:["Only storage systems","User experience, operational costs, and scalability","Physical hardware ownership","Network cables only"],a:1},
+      {q:"PERFORMANCE MONITORING HELPS ORGANIZATIONS:",o:["Ignore bottlenecks","Forecast resource needs and meet SLAs","Eliminate cloud costs completely","Disable scaling"],a:1},
+      {q:"WHICH OF THE FOLLOWING IS A COMPUTE METRIC?",o:["Packet loss","CPU utilization","Disk throughput","CDN latency"],a:1},
+      {q:"WHICH METRIC MEASURES NETWORK DELAY?",o:["Throughput","Latency","IOPS","CPU usage"],a:1},
+      {q:"IOPS STANDS FOR:",o:["Internet Operations Per Service","Input/Output Operations Per Second","Internal Optimization Processing System","Integrated Output Performance Scaling"],a:1},
+      {q:"WHICH AWS SERVICE IS USED FOR CLOUD MONITORING AND ALARMS?",o:["GuardDuty","CloudWatch","BigQuery","Terraform"],a:1},
+      {q:"WHICH MONITORING PLATFORM WAS FORMERLY KNOWN AS STACKDRIVER?",o:["Azure Monitor","Grafana","Google Cloud Operations Suite","Prometheus"],a:2},
+      {q:"SYNTHETIC MONITORING IS USED TO:",o:["Replace real users permanently","Simulate user interactions to assess availability","Encrypt storage systems","Reduce CPU utilization"],a:1},
+      {q:"DISTRIBUTED TRACING IS ESPECIALLY USEFUL FOR:",o:["Relational databases only","Monolithic applications","Microservices architectures","Firewall configuration"],a:2},
+      {q:"OVERPROVISIONING RESULTS IN:",o:["Reduced availability","Paying for unused resources","Stronger IAM policies","Improved consistency"],a:1},
+      {q:"WHICH CLOUD PRICING MODEL PROVIDES DISCOUNTED PRICING FOR LONG-TERM WORKLOADS?",o:["Spot instances only","Reserved instances","Community cloud","Serverless storage"],a:1},
+      {q:"SPOT INSTANCES ARE BEST SUITED FOR:",o:["Fault-tolerant workloads","Highly sensitive banking systems only","Permanent database servers only","Security monitoring systems"],a:0},
+      {q:"STORAGE TIERING REDUCES COSTS BY:",o:["Increasing CPU power","Moving infrequently accessed data to cheaper storage","Removing backups","Disabling encryption"],a:1},
+      {q:"WHICH AWS TOOL HELPS ANALYZE CLOUD SPENDING TRENDS?",o:["AWS Lambda","AWS Cost Explorer","AWS CloudTrail","AWS Inspector"],a:1},
+      {q:"HORIZONTAL SCALING REFERS TO:",o:["Increasing RAM and CPU in the same machine","Adding or removing VMs or containers","Compressing application logs","Encrypting network traffic"],a:1},
+      {q:"VERTICAL SCALING MEANS:",o:["Adding more instances","Increasing resources of an existing instance","Reducing application response time","Switching cloud providers"],a:1},
+      {q:"TARGET TRACKING SCALING AIMS TO:",o:["Maintain a target metric such as CPU utilization","Replace unhealthy containers manually","Eliminate load balancing","Disable autoscaling"],a:0},
+      {q:"WHICH KUBERNETES FEATURE AUTOMATICALLY SCALES CONTAINERS?",o:["VPC","Horizontal Pod Autoscaler (HPA)","CloudTrail","IAM"],a:1},
+      {q:"WHICH BENCHMARKING TOOL IS COMMONLY USED FOR LOAD TESTING WEB APPLICATIONS?",o:["Apache JMeter","Redis","Terraform","Kubernetes"],a:0},
+      {q:"WHICH PERFORMANCE TUNING TECHNIQUE IMPROVES DELIVERY OF STATIC CONTENT WITH LOW LATENCY?",o:["CDNs","RBAC","MFA","DREAD"],a:0},
+    ],
+    answers: [1,2,2,3,1,1,2,1,1,3,1,1,2,2,2,1,1,1,2,0,1,0,1,2,1,2,1,2,1,1,1,0,1,1,0,1,1,2,1,1,1,1,1,1,0,2,1,2,2,1,1,1,1,1,1,1,2,1,2,1,1,1,1,1,0,1,0,0]
+  },
+  {
+    title: "Final Simulation",
+    questions: [
+      {q:"WHICH COMPUTING PARADIGM RELIED ON A POWERFUL CENTRAL HUB WITH \"DUMB TERMINALS\"?",o:["Cluster Computing","Cloud Computing","Mainframe Computing","Edge Computing"],a:2},
+      {q:"WHICH CHARACTERISTIC OF CLOUD COMPUTING ALLOWS USERS TO PROVISION RESOURCES AUTOMATICALLY?",o:["Resource pooling","Rapid elasticity","On-demand self-service","Hybrid deployment"],a:2},
+      {q:"WHICH SERVICE MODEL DELIVERS SOFTWARE APPLICATIONS OVER THE INTERNET?",o:["IaaS","SaaS","PaaS","FaaS"],a:1},
+      {q:"A CLOUD ENVIRONMENT EXCLUSIVELY USED BY A SINGLE ORGANIZATION IS CALLED:",o:["Public Cloud","Community Cloud","Hybrid Cloud","Private Cloud"],a:3},
+      {q:"WHICH FACTOR MAINLY MOTIVATED NETFLIX TO MIGRATE TO AWS?",o:["Reduced security","Scalability","Smaller storage","Dedicated hardware"],a:1},
+      {q:"AWS GEOGRAPHIC REGIONS ARE COMPOSED OF MULTIPLE:",o:["Containers","Availability Zones","Hypervisors","Firewalls"],a:1},
+      {q:"HORIZONTAL SCALING REFERS TO:",o:["Increasing CPU and RAM of one machine","Moving workloads to edge devices","Adding more instances or servers","Reducing storage size"],a:2},
+      {q:"WHICH SCALING TYPE INCREASES THE CPU/RAM OF AN EXISTING INSTANCE?",o:["Hybrid scaling","Horizontal scaling","Elastic scaling","Vertical scaling"],a:3},
+      {q:"AUTO-SCALING IS MAINLY USED TO:",o:["Encrypt databases","Handle workload fluctuations","Replace IAM policies","Eliminate monitoring"],a:1},
+      {q:"WHICH CLOUD COMPONENT FILTERS TRAFFIC IN A VPC?",o:["Route Table","Security Group","Availability Zone","Hypervisor"],a:1},
+      {q:"WHICH TOOL IS MAINLY USED FOR INFRASTRUCTURE AS CODE (IAC)?",o:["Kubernetes","Docker","Terraform","Prometheus"],a:2},
+      {q:"EDGE COMPUTING REDUCES LATENCY BY PROCESSING DATA:",o:["At centralized data centers","Near the data source","In SaaS applications","In public cloud only"],a:1},
+      {q:"TYPE 1 HYPERVISORS OPERATE DIRECTLY ON:",o:["Host Operating System","Docker containers","Bare-metal hardware","Virtual machines"],a:2},
+      {q:"DOCKER IS PRIMARILY ASSOCIATED WITH:",o:["Virtual machines","Containerization","Hypervisors","Data lakes"],a:1},
+      {q:"WHY DO CONTAINERS HAVE LOWER OVERHEAD THAN VMS?",o:["They require more RAM","They use nested virtualization","They share the host OS kernel","They run multiple hypervisors"],a:2},
+      {q:"WHICH OF THE FOLLOWING IS A TYPE 1 HYPERVISOR?",o:["Oracle VirtualBox","VMware Workstation","KVM","Docker"],a:2},
+      {q:"FOG COMPUTING MAINLY OPERATES:",o:["Inside SaaS platforms only","Between edge devices and the cloud","In centralized servers only","In community clouds only"],a:1},
+      {q:"KUBERNETES IS DESIGNED TO MANAGE:",o:["Firewalls","Relational databases","Containerized applications","Hypervisors"],a:2},
+      {q:"WHICH CLOUD DEPLOYMENT MODEL COMBINES PUBLIC AND PRIVATE CLOUDS?",o:["Community Cloud","Hybrid Cloud","Edge Cloud","Cluster Cloud"],a:1},
+      {q:"OPTIMIZING VIRTUALIZATION PERFORMANCE INCLUDES:",o:["Increasing hypervisor overhead","Allocating maximum resources always","Right-sizing VMs","Using unnecessary nested virtualization"],a:2},
+      {q:"WHICH STORAGE SERVICE IS OFFERED BY AWS FOR OBJECT STORAGE?",o:["Azure Blob Storage","Hadoop HDFS","Amazon S3","Ceph"],a:2},
+      {q:"AMAZON S3 ORGANIZES STORED DATA INTO:",o:["Containers","Buckets","Nodes","Clusters"],a:1},
+      {q:"WHICH AMAZON S3 FEATURE AUTOMATICALLY MOVES DATA BETWEEN STORAGE CLASSES?",o:["IAM","Lifecycle management","Auto-scaling","Load balancing"],a:1},
+      {q:"WHICH CLOUD STORAGE PLATFORM PROVIDES STORAGE CLASSES SUCH AS NEARLINE AND COLDLINE?",o:["Amazon S3","Azure Blob Storage","Google Cloud Storage","Ceph"],a:2},
+      {q:"WHICH CLOUD PROVIDER OFFERS BLOB STORAGE?",o:["Google Cloud","IBM Cloud","AWS","Microsoft Azure"],a:3},
+      {q:"AZURE BLOB STORAGE IS OPTIMIZED FOR STORING:",o:["Structured relational data only","Small text files only","Massive amounts of unstructured data","Virtual machines"],a:2},
+      {q:"WHICH AZURE BLOB STORAGE TIER IS INTENDED FOR INFREQUENTLY ACCESSED DATA?",o:["Hot tier","Archive tier","Cool tier","Premium tier"],a:2},
+      {q:"WHICH DISTRIBUTED FILE SYSTEM IS DESIGNED FOR BATCH PROCESSING WITH MAPREDUCE?",o:["Ceph","Lustre","HDFS","MongoDB"],a:2},
+      {q:"HDFS IMPROVES FAULT TOLERANCE BY:",o:["Encrypting all files","Replicating data blocks across nodes","Using only one metadata server","Removing redundancy"],a:1},
+      {q:"WHICH DISTRIBUTED STORAGE SYSTEM USES THE CRUSH ALGORITHM?",o:["Lustre","HDFS","Ceph","DynamoDB"],a:2},
+      {q:"LUSTRE IS COMMONLY USED IN:",o:["Mobile gaming","Supercomputing environments","Social media analytics only","Web hosting only"],a:1},
+      {q:"WHICH NOSQL DATABASE SUPPORTS KEY-VALUE AND DOCUMENT MODELS?",o:["Cassandra","MongoDB Atlas","DynamoDB","HDFS"],a:2},
+      {q:"WHICH DATABASE FOLLOWS A PEER-TO-PEER ARCHITECTURE WITH NO SINGLE POINT OF FAILURE?",o:["DynamoDB","Cassandra","MongoDB Atlas","BigQuery"],a:1},
+      {q:"MONGODB ATLAS PRIMARILY USES:",o:["Wide-column schema","JSON-like document schema","Relational tables","Object storage buckets"],a:1},
+      {q:"WHICH CONSISTENCY MODEL GUARANTEES ALL USERS SEE THE SAME DATA SIMULTANEOUSLY?",o:["Eventual consistency","Causal consistency","Strong consistency","Delayed consistency"],a:2},
+      {q:"IN EVENTUAL CONSISTENCY:",o:["Immediate consistency is guaranteed","Updates eventually propagate through the system","Replication is disabled","Data is never synchronized"],a:1},
+      {q:"WHICH REPLICATION STRATEGY ALLOWS MULTIPLE NODES TO HANDLE WRITES?",o:["Master-slave replication","Multi-master replication","Cold standby replication","Quorum denial"],a:1},
+      {q:"QUORUM-BASED REPLICATION BALANCES:",o:["Security and encryption","Cost and latency","Consistency and availability","Virtualization and storage"],a:2},
+      {q:"WHICH DATA WAREHOUSE IS FULLY SERVERLESS?",o:["Snowflake","Amazon Redshift","Google BigQuery","Cassandra"],a:2},
+      {q:"AMAZON REDSHIFT USES:",o:["Row-based storage only","Columnar storage and parallel processing","Blockchain architecture","Peer-to-peer architecture"],a:1},
+      {q:"WHICH STREAMING PLATFORM ENABLES DISTRIBUTED REAL-TIME DATA FEEDS?",o:["Terraform","Apache Kafka","Kubernetes","Docker"],a:1},
+      {q:"WHICH CLOUD SERVICE IS DESIGNED FOR STREAM AND BATCH PROCESSING USING APACHE BEAM SDK?",o:["AWS Lambda","Google Cloud Dataflow","Amazon S3","Snowflake"],a:1},
+      {q:"WHICH DISASTER RECOVERY STRATEGY KEEPS SYSTEMS FULLY ACTIVE AND REDUNDANT?",o:["Cold standby","Warm standby","Hot standby","Delayed standby"],a:2},
+      {q:"WHICH ENCRYPTION METHOD PROTECTS DATA IN TRANSIT?",o:["AES-256","TLS/SSL","DAX","HDFS replication"],a:1},
+      {q:"WHICH COMPLIANCE REGULATION FOCUSES ON EU CITIZENS' PRIVACY RIGHTS?",o:["HIPAA","GDPR","SOC 2","PCI-DSS"],a:1},
+      {q:"IN THE SHARED RESPONSIBILITY MODEL, THE CLOUD PROVIDER IS MAINLY RESPONSIBLE FOR:",o:["Application-level security","Security OF the cloud infrastructure","User password management","IAM permissions"],a:1},
+      {q:"WHICH CLOUD SECURITY ISSUE IS CONSIDERED THE #1 CAUSE OF CLOUD BREACHES?",o:["Hardware failure","Misconfiguration","Encryption failure","Weak networking"],a:1},
+      {q:"STORING ACCESS KEYS PUBLICLY ON GITHUB IS AN EXAMPLE OF:",o:["IAM failure","Disaster recovery","Strong consistency","Storage tiering"],a:0},
+      {q:"WHICH TYPE OF ATTACK OVERWHELMS CLOUD RESOURCES WITH TRAFFIC?",o:["SQL Injection","Spoofing","DDoS attack","Encryption attack"],a:2},
+      {q:"WHICH CYBERCRIME TRICKS USERS INTO REVEALING SENSITIVE INFORMATION THROUGH FAKE EMAILS?",o:["Malware","Ransomware","Website spoofing","Phishing"],a:3},
+      {q:"THE PRINCIPLE OF GRANTING ONLY THE EXACT PERMISSIONS NEEDED IS CALLED:",o:["Federation","Least Privilege","Auto-scaling","Strong consistency"],a:1},
+      {q:"AUTHENTICATION (AUTHN) IS THE PROCESS OF:",o:["Determining permissions","Verifying identity","Encrypting data","Monitoring logs"],a:1},
+      {q:"WHICH ACCESS CONTROL METHOD ASSIGNS PERMISSIONS TO ROLES?",o:["ABAC","RBAC","PBAC","MFA"],a:1},
+      {q:"WHICH ACCESS CONTROL METHOD CONSIDERS ATTRIBUTES SUCH AS LOCATION OR DEVICE TYPE?",o:["RBAC","IAM","ABAC","TLS"],a:2},
+      {q:"WHICH ENCRYPTION STANDARD COMMONLY PROTECTS DATA AT REST?",o:["TLS","AES-256","SHA-256","OAuth"],a:1},
+      {q:"WHICH CLOUD SECURITY TOOL PROTECTS AGAINST SQL INJECTION AND XSS?",o:["Web Application Firewall (WAF)","Kubernetes","HDFS","Grafana"],a:0},
+      {q:"IN STRIDE, SPOOFING IDENTITY VIOLATES:",o:["Authentication","Authorization","Integrity","Availability"],a:0},
+      {q:"IN STRIDE, TAMPERING WITH DATA VIOLATES:",o:["Confidentiality","Non-repudiation","Integrity","Authentication"],a:2},
+      {q:"WHICH DREAD COMPONENT EVALUATES HOW SEVERE THE IMPACT OF AN ATTACK WOULD BE?",o:["Discoverability","Reproducibility","Damage Potential","Exploitability"],a:2},
+      {q:"WHICH DREAD FACTOR MEASURES HOW EASY IT IS TO DISCOVER A VULNERABILITY?",o:["Damage","Discoverability","Affected Users","Reproducibility"],a:1},
+      {q:"PASTA STANDS FOR:",o:["Process for Attack Simulation and Threat Analysis","Platform for Advanced Security Threat Assessment","Process for Automated Security Testing Architecture","Protection and Security Threat Alignment"],a:0},
+      {q:"IN PASTA, IDENTIFYING BUSINESS GOALS AND CRITICAL ASSETS OCCURS IN:",o:["Step 1","Step 3","Step 5","Step 7"],a:0},
+      {q:"WHICH PASTA STEP INVOLVES IDENTIFYING ENTRY POINTS AND PRIVILEGED PROCESSES?",o:["Threat Analysis","Risk Analysis","Technical Scope","Application Decomposition"],a:3},
+      {q:"WHICH CLOUD LOGGING SERVICE RECORDS EVERY API CALL IN AWS?",o:["AWS Inspector","CloudTrail","GuardDuty","CloudWatch"],a:1},
+      {q:"AWS GUARDDUTY MAINLY HELPS WITH:",o:["VM provisioning","Threat detection using ML","Encryption management","Database indexing"],a:1},
+      {q:"DEVSECOPS PROMOTES:",o:["Security only after deployment","Ignoring CI/CD pipelines","Integrating security into DevOps lifecycle","Removing automated testing"],a:2},
+      {q:"WHICH TESTING METHOD ANALYZES SOURCE CODE BEFORE COMPILATION?",o:["DAST","SCA","SAST","CSPM"],a:2},
+      {q:"WHICH ZERO TRUST PRINCIPLE ASSUMES ATTACKERS MAY ALREADY EXIST INSIDE THE NETWORK?",o:["Never Trust, Always Verify","Assume Breach","Least Privilege","Resource Pooling"],a:1},
+      {q:"WHICH METRIC BELONGS TO STORAGE PERFORMANCE MONITORING?",o:["CPU utilization","Packet loss","Transaction time","IOPS"],a:3},
+      {q:"WHICH AUTO-SCALING METHOD ADJUSTS RESOURCES TO MAINTAIN A TARGET METRIC SUCH AS CPU AT 70%?",o:["Step Scaling","Scheduled Scaling","Vertical Scaling","Target Tracking Scaling"],a:3},
+    ],
+    answers: [2,2,1,3,1,1,2,3,1,1,2,1,2,1,2,2,1,2,1,2,2,1,1,2,3,2,2,2,1,2,1,2,1,1,2,1,1,2,2,1,1,1,2,1,1,1,1,0,2,3,1,1,1,2,1,0,0,2,2,1,0,0,3,1,1,2,2,1,3,3]
+  }
+];
+
+// ════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════
+let currentSection = 0;
+let currentQ = 0;
+let userAnswers = [];   // per section array
+let bookmarks = [];
+let timerInterval = null;
+let totalSeconds = 9000;
+let elapsed = 0;
+
+function initState() {
+  userAnswers = SECTIONS.map(s => new Array(s.questions.length).fill(-1));
+  bookmarks = SECTIONS.map(s => new Array(s.questions.length).fill(false));
+}
+initState();
+
+// ════════════════════════════════════════════════════
+//  TIMER
+// ════════════════════════════════════════════════════
+function startTimer() {
+  clearInterval(timerInterval);
+  elapsed = 0;
+  timerInterval = setInterval(() => {
+    elapsed++;
+    const rem = totalSeconds - elapsed;
+    if (rem <= 0) { clearInterval(timerInterval); submitTest(); return; }
+    const h = String(Math.floor(rem/3600)).padStart(2,'0');
+    const m = String(Math.floor((rem%3600)/60)).padStart(2,'0');
+    const s = String(rem%60).padStart(2,'0');
+    document.getElementById('timer').textContent = `${h}:${m}:${s}`;
+    document.getElementById('timer-fill').style.width = ((rem/totalSeconds)*100)+'%';
+  }, 1000);
+}
+startTimer();
+
+// ════════════════════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════════════════════
+function render() {
+  const sec = SECTIONS[currentSection];
+  const total = sec.questions.length;
+  const qObj = sec.questions[currentQ];
+  const ans = userAnswers[currentSection][currentQ];
+  const correct = sec.answers[currentQ];
+  const labels = ['A','B','C','D'];
+
+  document.getElementById('bc-section').textContent = sec.title;
+  document.getElementById('bc-q').textContent = `Question ${currentQ+1} of ${total}`;
+  document.getElementById('q-counter').textContent = `Question ${currentQ+1} of ${total}`;
+  document.getElementById('q-num').textContent = `${currentQ+1}.`;
+  document.getElementById('q-text').textContent = qObj.q;
+
+  // Goto select
+  const gsel = document.getElementById('goto-sel');
+  gsel.innerHTML = '';
+  for(let i=0;i<total;i++){
+    const o = document.createElement('option');
+    o.value = i; o.textContent = `Question ${i+1}`;
+    if(i===currentQ) o.selected = true;
+    gsel.appendChild(o);
+  }
+
+  // Options
+  const wrap = document.getElementById('options-wrap');
+  wrap.innerHTML = '';
+  const answered = ans !== -1;
+  qObj.o.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    if(answered) btn.classList.add('disabled');
+    if(ans === i) {
+      if(i === correct) btn.classList.add('correct');
+      else btn.classList.add('wrong');
+    } else if(answered && i === correct) {
+      btn.classList.add('show-correct');
+    }
+    btn.innerHTML = `<span class="opt-circle">${labels[i]}</span><span>${opt}</span>`;
+    if(!answered) btn.onclick = () => selectAnswer(i);
+    wrap.appendChild(btn);
+  });
+
+  // Feedback
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  if(answered) {
+    fb.classList.add('show');
+    if(ans === correct) {
+      fb.classList.add('correct-fb');
+      fb.innerHTML = '✅ Correct! Well done.';
+    } else {
+      fb.classList.add('wrong-fb');
+      fb.innerHTML = `❌ Wrong. The correct answer is <strong>${labels[correct]}. ${qObj.o[correct]}</strong>`;
+    }
+  }
+
+  // Explanation (hidden by default)
+  document.getElementById('explanation').className = 'explanation';
+
+  // Bookmark btn
+  const bmBtn = document.getElementById('bm-btn');
+  bmBtn.className = 'q-action-btn' + (bookmarks[currentSection][currentQ] ? ' bookmarked' : '');
+  bmBtn.innerHTML = bookmarks[currentSection][currentQ] ? '🔖 Bookmarked' : '🔖 Bookmark';
+
+  // Nav buttons
+  document.getElementById('prev-btn').disabled = (currentQ === 0);
+  document.getElementById('next-btn').disabled = (currentQ === total - 1);
+
+  // Progress
+  const answered_count = userAnswers[currentSection].filter(a=>a!==-1).length;
+  const pct = Math.round((answered_count/total)*100);
+  document.getElementById('progress-fill').style.width = pct+'%';
+  document.getElementById('progress-pct').textContent = pct+'%';
+  document.getElementById('timer-pct').textContent = pct+'% Completed';
+
+  const msgs = ['Keep Going!','Almost There!','Great Progress!','You\'re Crushing It!'];
+  document.getElementById('motivate-text').textContent = msgs[Math.floor(pct/26)] || msgs[3];
+
+  // Sidebar badges
+  document.getElementById('sb-bm').textContent = bookmarks.flat().filter(Boolean).length;
+  document.getElementById('sb-inc').textContent = userAnswers.flat().filter((a,i)=>{
+    // simplified: count wrongs
+    return a!==-1 && false;
+  }).length;
+
+  buildNavigator();
+}
+
+function buildNavigator() {
+  const nav = document.getElementById('q-nav');
+  nav.innerHTML = '';
+  const sec = SECTIONS[currentSection];
+  sec.questions.forEach((_, i) => {
+    if(i===35){const sep=document.createElement('div');sep.className='qn-sep';sep.textContent='…';nav.appendChild(sep);}
+    const btn = document.createElement('button');
+    btn.className = 'qn-btn';
+    if(i === currentQ) btn.classList.add('current');
+    else if(bookmarks[currentSection][i]) btn.classList.add('bookmarked-q');
+    else if(userAnswers[currentSection][i] !== -1) btn.classList.add('answered');
+    else btn.classList.add('unanswered');
+    btn.textContent = i+1;
+    btn.onclick = () => { currentQ = i; render(); };
+    nav.appendChild(btn);
+  });
+}
+
+// ════════════════════════════════════════════════════
+//  INTERACTIONS
+// ════════════════════════════════════════════════════
+function selectAnswer(i) {
+  userAnswers[currentSection][currentQ] = i;
+  render();
+}
+
+function navigate(dir) {
+  const total = SECTIONS[currentSection].questions.length;
+  currentQ = Math.max(0, Math.min(total-1, currentQ+dir));
+  render();
+}
+
+function gotoQ(val) {
+  currentQ = parseInt(val);
+  render();
+}
+
+function toggleBookmark() {
+  bookmarks[currentSection][currentQ] = !bookmarks[currentSection][currentQ];
+  render();
+}
+
+function showExplanation() {
+  const exp = document.getElementById('explanation');
+  const sec = SECTIONS[currentSection];
+  const qObj = sec.questions[currentQ];
+  const correct = sec.answers[currentQ];
+  const labels = ['A','B','C','D'];
+  document.getElementById('exp-text').textContent = `The correct answer is ${labels[correct]}. ${qObj.o[correct]}. This question tests your knowledge of ${sec.title} topics covered in cloud computing fundamentals.`;
+  exp.className = 'explanation show';
+}
+
+function setSection(idx) {
+  currentSection = idx;
+  currentQ = 0;
+  // Update tabs
+  document.querySelectorAll('.stab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  document.querySelectorAll('.sub-item').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  render();
+}
+
+function submitTest() {
+  const sec = SECTIONS[currentSection];
+  const answers = userAnswers[currentSection];
+  const correct = answers.filter((a,i)=>a===sec.answers[i]).length;
+  const wrong = answers.filter((a,i)=>a!==-1 && a!==sec.answers[i]).length;
+  const skipped = answers.filter(a=>a===-1).length;
+  const bm = bookmarks[currentSection].filter(Boolean).length;
+  const pct = Math.round((correct/sec.questions.length)*100);
+
+  document.getElementById('modal-score').textContent = correct;
+  document.getElementById('modal-total').textContent = sec.questions.length;
+  document.getElementById('modal-pct').textContent = pct + '%';
+  document.getElementById('stat-correct').textContent = correct;
+  document.getElementById('stat-wrong').textContent = wrong;
+  document.getElementById('stat-skipped').textContent = skipped;
+  document.getElementById('stat-bm').textContent = bm;
+
+  const icons = ['😓','😐','🙂','😊','🎯'];
+  const iconIdx = Math.floor(pct/21);
+  document.getElementById('modal-icon').textContent = icons[Math.min(iconIdx,4)];
+  document.getElementById('modal-title').textContent = pct>=80?'Excellent Work!':pct>=60?'Good Effort!':'Keep Practicing!';
+  document.getElementById('modal-sub').textContent = `You scored ${pct}% on ${sec.title}`;
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+function restartSection() {
+  userAnswers[currentSection] = new Array(SECTIONS[currentSection].questions.length).fill(-1);
+  bookmarks[currentSection] = new Array(SECTIONS[currentSection].questions.length).fill(false);
+  currentQ = 0;
+  closeModal();
+  render();
+}
+
+// ════════════════════════════════════════════════════
+//  PAGE NAVIGATION
+// ════════════════════════════════════════════════════
+const PAGES = ['practice','quizzes','exams','analytics','leaderboard'];
+function showPage(page) {
+  // hide all
+  document.querySelector('.layout').style.display = 'none';
+  ['quizzes','exams','analytics','leaderboard'].forEach(p => {
+    document.getElementById(p+'-page').classList.remove('show');
+  });
+  // deactivate all nav
+  PAGES.forEach(p => {
+    const el = document.getElementById('nav-'+p);
+    if(el) el.classList.remove('active');
+  });
+  const navEl = document.getElementById('nav-'+page);
+  if(navEl) navEl.classList.add('active');
+
+  if(page === 'practice') {
+    document.querySelector('.layout').style.display = 'flex';
+  } else {
+    document.getElementById(page+'-page').classList.add('show');
+    if(page === 'analytics') renderAnalytics();
+    if(page === 'quizzes')   renderQuizzes();
+    if(page === 'leaderboard') renderLeaderboard();
+  }
+}
+
+function renderQuizzes() {
+  const totalAnswered = userAnswers.flat().filter(a=>a!==-1).length;
+  const totalCorrect  = SECTIONS.reduce((s,sec,si)=>s+userAnswers[si].filter((a,qi)=>a===sec.answers[qi]).length,0);
+  document.getElementById('qz-total-done').textContent = totalAnswered;
+  document.getElementById('qz-total-correct').textContent = totalCorrect;
+  // best score across sections
+  const bests = SECTIONS.map((sec,si)=>{
+    const ans = userAnswers[si];
+    const done = ans.filter(a=>a!==-1).length;
+    if(!done) return null;
+    const correct = ans.filter((a,qi)=>a===sec.answers[qi]).length;
+    return Math.round(correct/sec.questions.length*100);
+  }).filter(x=>x!==null);
+  document.getElementById('qz-best-score').textContent = bests.length ? Math.max(...bests)+'%' : '—';
+  // per-section progress bars
+  SECTIONS.forEach((sec,si)=>{
+    const done = userAnswers[si].filter(a=>a!==-1).length;
+    const pct = Math.round(done/sec.questions.length*100);
+    document.getElementById('qz-pct-'+si).textContent = pct+'%';
+    document.getElementById('qz-bar-'+si).style.width = pct+'%';
+  });
+}
+
+function renderLeaderboard() {
+  // Build fake classmates + real user
+  const userCorrect = SECTIONS.reduce((s,sec,si)=>s+userAnswers[si].filter((a,qi)=>a===sec.answers[qi]).length,0);
+  const userAnswered = userAnswers.flat().filter(a=>a!==-1).length;
+  const userAcc = userAnswered>0 ? Math.round(userCorrect/userAnswered*100) : 0;
+  const userScore = Math.round(userCorrect/210*100);
+
+  const classmates = [
+    {name:'Sara Ahmed',    acc:92, score:88, correct:185, color:'#a78bfa'},
+    {name:'Omar Khalil',   acc:87, score:82, correct:172, color:'#f472b6'},
+    {name:'Nour Hassan',   acc:81, score:76, correct:160, color:'#34d399'},
+    {name:'Yasmine Ali',   acc:79, score:74, correct:155, color:'#fb923c'},
+    {name:'Karim Saad',    acc:75, score:70, correct:147, color:'#60a5fa'},
+    {name:'Lina Mostafa',  acc:68, score:63, correct:133, color:'#f87171'},
+    {name:'Ahmed Tarek',   acc:61, score:57, correct:120, color:'#a3e635'},
+    {name:'Mona Sherif',   acc:54, score:50, correct:105, color:'#e879f9'},
+    {name:'Ziad Ibrahim',  acc:47, score:43, correct: 90, color:'#38bdf8'},
+  ];
+  const you = {name:'Abdelrahman Mohamed', acc:userAcc, score:userScore, correct:userCorrect, color:'#4f8ef7', isYou:true};
+  const all = [...classmates, you].sort((a,b)=>b.score-a.score);
+  const yourRank = all.findIndex(x=>x.isYou)+1;
+
+  document.getElementById('lb-your-rank-num').textContent = '#'+yourRank;
+  document.getElementById('lb-your-score-line').textContent = `${userCorrect}/210 correct · ${userAnswered} answered`;
+  document.getElementById('lb-your-pct').textContent = userAcc+'%';
+
+  const posClasses = ['gold','silver','bronze'];
+  const medals = ['🥇','🥈','🥉'];
+  const rowsEl = document.getElementById('lb-rows');
+  rowsEl.innerHTML = '';
+  all.forEach((s,i) => {
+    const pos = i+1;
+    const div = document.createElement('div');
+    div.className = 'lb-row' + (s.isYou?' you':'');
+    const posLabel = pos<=3 ? `<span class="lb-pos ${posClasses[pos-1]}">${medals[pos-1]}</span>` : `<span class="lb-pos" style="color:var(--muted);">${pos}</span>`;
+    const youTag = s.isYou ? `<span class="lb-you-tag">You</span>` : '';
+    const initials = s.name.split(' ').map(w=>w[0]).join('').slice(0,2);
+    const accClass = s.acc>=75?'good':s.acc>=50?'':'bad';
+    div.innerHTML = `
+      ${posLabel}
+      <div class="lb-avatar-row">
+        <div class="lb-av" style="background:${s.color}22;color:${s.color};">${initials}</div>
+        <div class="lb-name">${s.name}${youTag}</div>
+      </div>
+      <div class="lb-cell">${s.score}%</div>
+      <div class="lb-cell ${accClass}">${s.acc}%</div>
+      <div class="lb-cell">${s.correct}</div>`;
+    rowsEl.appendChild(div);
+  });
+}
+
+
+// ════════════════════════════════════════════════════
+//  ANALYTICS RENDER
+// ════════════════════════════════════════════════════
+function renderAnalytics() {
+  const labels = ['A','B','C','D'];
+  const sectionColors = ['#4f8ef7','#22c55e','#f59e0b'];
+  const sectionNames = ['Lecture (1:4)','Lecture (5:7)','Final Sim'];
+
+  // Compute stats per section
+  const stats = SECTIONS.map((sec, si) => {
+    const ans = userAnswers[si];
+    const answered = ans.filter(a => a !== -1).length;
+    const correct = ans.filter((a,i) => a !== -1 && a === sec.answers[i]).length;
+    const wrong = ans.filter((a,i) => a !== -1 && a !== sec.answers[i]).length;
+    const skipped = ans.filter(a => a === -1).length;
+    const pct = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+    const scorePct = Math.round((correct / sec.questions.length) * 100);
+    return { answered, correct, wrong, skipped, pct, scorePct, total: sec.questions.length };
+  });
+
+  const totalAnswered = stats.reduce((s,x) => s + x.answered, 0);
+  const totalCorrect  = stats.reduce((s,x) => s + x.correct, 0);
+  const totalWrong    = stats.reduce((s,x) => s + x.wrong, 0);
+  const totalBm       = bookmarks.flat().filter(Boolean).length;
+  const totalSkipped  = 210 - totalAnswered;
+  const overallAcc    = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+
+  // KPIs
+  document.getElementById('an-total-answered').textContent = totalAnswered;
+  document.getElementById('an-total-pct').textContent = totalAnswered + ' of 210 (' + Math.round(totalAnswered/210*100) + '%)';
+  document.getElementById('an-total-correct').textContent = totalCorrect;
+  document.getElementById('an-accuracy').textContent = overallAcc + '% accuracy';
+  document.getElementById('an-total-wrong').textContent = totalWrong;
+  document.getElementById('an-wrong-pct').textContent = totalAnswered > 0 ? Math.round(totalWrong/totalAnswered*100) + '% error rate' : '0% error rate';
+  document.getElementById('an-total-bm').textContent = totalBm;
+
+  // Bar chart
+  const barsEl = document.getElementById('an-bars');
+  barsEl.innerHTML = '';
+  SECTIONS.forEach((sec, si) => {
+    const s = stats[si];
+    const el = document.createElement('div');
+    el.className = 'bar-item';
+    const pct = s.scorePct;
+    el.innerHTML = `
+      <span class="bar-label">${sectionNames[si]}</span>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${pct}%;background:${sectionColors[si]};">
+          <span class="bar-pct">${pct}%</span>
+        </div>
+      </div>
+      <span class="bar-val">${s.correct}/${s.total}</span>`;
+    barsEl.appendChild(el);
+  });
+
+  // Donut chart
+  const donutData = [
+    { label: 'Correct',  val: totalCorrect,  color: '#22c55e' },
+    { label: 'Wrong',    val: totalWrong,    color: '#ef4444' },
+    { label: 'Skipped',  val: totalSkipped,  color: '#2a3347' },
+  ];
+  const total = 210;
+  let cumAngle = -Math.PI / 2;
+  const cx = 70, cy = 70, r = 52, sw = 20;
+  const svg = document.getElementById('an-donut');
+  svg.innerHTML = '';
+  donutData.forEach(d => {
+    if(d.val <= 0) return;
+    const angle = (d.val / total) * 2 * Math.PI;
+    const x1 = cx + r * Math.cos(cumAngle);
+    const y1 = cy + r * Math.sin(cumAngle);
+    const x2 = cx + r * Math.cos(cumAngle + angle);
+    const y2 = cy + r * Math.sin(cumAngle + angle);
+    const large = angle > Math.PI ? 1 : 0;
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`);
+    path.setAttribute('stroke', d.color);
+    path.setAttribute('stroke-width', sw);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke-linecap', 'round');
+    svg.appendChild(path);
+    cumAngle += angle;
+  });
+  // Center text
+  const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+  txt.setAttribute('x', cx); txt.setAttribute('y', cy - 6);
+  txt.setAttribute('text-anchor', 'middle');
+  txt.setAttribute('fill', '#e6edf3');
+  txt.setAttribute('font-size', '20');
+  txt.setAttribute('font-weight', '800');
+  txt.setAttribute('font-family', 'Syne, sans-serif');
+  txt.textContent = overallAcc + '%';
+  svg.appendChild(txt);
+  const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+  lbl.setAttribute('x', cx); lbl.setAttribute('y', cy + 12);
+  lbl.setAttribute('text-anchor', 'middle');
+  lbl.setAttribute('fill', '#8b949e');
+  lbl.setAttribute('font-size', '10');
+  lbl.textContent = 'Accuracy';
+  svg.appendChild(lbl);
+
+  // Donut legend
+  const legEl = document.getElementById('an-donut-legend');
+  legEl.innerHTML = '';
+  donutData.forEach(d => {
+    const pct = Math.round(d.val / 210 * 100);
+    legEl.innerHTML += `<div class="donut-leg-item">
+      <span class="donut-leg-dot" style="background:${d.color};"></span>
+      <span>${d.label}</span>
+      <span class="donut-leg-val">${d.val} <span style="color:var(--muted);font-size:10px;">(${pct}%)</span></span>
+    </div>`;
+  });
+
+  // Best / Worst
+  const bwEl = document.getElementById('an-bestworst');
+  const sorted = stats.map((s,i)=>({...s, name: sectionNames[i], color: sectionColors[i], idx:i}))
+    .filter(s=>s.answered>0)
+    .sort((a,b)=>b.pct-a.pct);
+  if(sorted.length === 0) {
+    bwEl.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">Answer questions to see results</div>';
+  } else {
+    bwEl.innerHTML = '';
+    if(sorted[0]) {
+      bwEl.innerHTML += `<div class="lec-medal-item" style="border-color:rgba(34,197,94,.3);">
+        <div><div style="font-size:10px;color:var(--green);font-weight:700;margin-bottom:2px;">🥇 BEST</div>
+        <div class="lec-medal-name">${sorted[0].name}</div></div>
+        <div class="lec-medal-score" style="color:var(--green);">${sorted[0].pct}%</div>
+      </div>`;
+    }
+    const worst = sorted[sorted.length-1];
+    if(worst && worst !== sorted[0]) {
+      bwEl.innerHTML += `<div class="lec-medal-item" style="border-color:rgba(239,68,68,.3);">
+        <div><div style="font-size:10px;color:var(--red);font-weight:700;margin-bottom:2px;">⚠️ NEEDS WORK</div>
+        <div class="lec-medal-name">${worst.name}</div></div>
+        <div class="lec-medal-score" style="color:var(--red);">${worst.pct}%</div>
+      </div>`;
+    }
+    // Tip
+    const tip = worst && worst.pct < 60 ? `Focus more on <strong style="color:var(--accent);">${worst.name}</strong> — you're at ${worst.pct}%!` : `Great job! Keep practicing to maintain your scores.`;
+    bwEl.innerHTML += `<div style="background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.2);border-radius:9px;padding:10px 12px;font-size:12px;color:var(--muted);">💡 ${tip}</div>`;
+  }
+
+  // Accuracy rings (SVG mini donuts)
+  const ringsEl = document.getElementById('an-rings');
+  ringsEl.innerHTML = '';
+  SECTIONS.forEach((sec, si) => {
+    const s = stats[si];
+    const pct = s.pct;
+    const circumference = 2 * Math.PI * 28;
+    const dash = (pct / 100) * circumference;
+    ringsEl.innerHTML += `<div class="radial-wrap">
+      <svg width="76" height="76" viewBox="0 0 76 76">
+        <circle cx="38" cy="38" r="28" fill="none" stroke="var(--surface2)" stroke-width="9"/>
+        <circle cx="38" cy="38" r="28" fill="none" stroke="${sectionColors[si]}" stroke-width="9"
+          stroke-dasharray="${dash.toFixed(1)} ${circumference.toFixed(1)}"
+          stroke-dashoffset="${(circumference/4).toFixed(1)}"
+          stroke-linecap="round" transform="rotate(-90 38 38)" style="transform-origin:38px 38px;transform:rotate(-90deg);"/>
+        <text x="38" y="42" text-anchor="middle" fill="${sectionColors[si]}" font-size="13" font-weight="800" font-family="Syne,sans-serif">${pct}%</text>
+      </svg>
+      <div class="radial-lbl" style="text-align:center;">${sectionNames[si]}</div>
+    </div>`;
+  });
+
+  // Heatmap
+  const hmEl = document.getElementById('an-heatmap');
+  hmEl.innerHTML = '';
+  const allAnswers = SECTIONS.flatMap((sec, si) => userAnswers[si]);
+  const blockSize = Math.ceil(allAnswers.length / 70);
+  for(let i = 0; i < 70; i++) {
+    const block = allAnswers.slice(i*3, i*3+3);
+    const answeredInBlock = block.filter(a => a !== -1).length;
+    const intensity = answeredInBlock / 3;
+    const alpha = 0.1 + intensity * 0.85;
+    const cell = document.createElement('div');
+    cell.className = 'heat-cell';
+    cell.style.background = `rgba(79,142,247,${alpha.toFixed(2)})`;
+    cell.title = `Block ${i+1}: ${block.filter(a=>a!==-1).length} answered`;
+    hmEl.appendChild(cell);
+  }
+
+  // Wrong questions list
+  const wrongEl = document.getElementById('an-wrong-list');
+  const wrongItems = [];
+  SECTIONS.forEach((sec, si) => {
+    userAnswers[si].forEach((a, qi) => {
+      if(a !== -1 && a !== sec.answers[qi]) {
+        wrongItems.push({ si, qi, sec, a, correct: sec.answers[qi] });
+      }
+    });
+  });
+  document.getElementById('an-wrong-count').textContent = wrongItems.length > 0 ? `(${wrongItems.length} questions)` : '';
+  if(wrongItems.length === 0) {
+    wrongEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:14px;">🎉 No wrong answers yet — keep it up!</div>';
+  } else {
+    wrongEl.innerHTML = '';
+    wrongItems.slice(0,50).forEach(w => {
+      const qText = w.sec.questions[w.qi].q;
+      const yourAns = w.sec.questions[w.qi].o[w.a];
+      const correctAns = w.sec.questions[w.qi].o[w.correct];
+      const div = document.createElement('div');
+      div.className = 'wrong-item';
+      div.innerHTML = `<div class="wrong-item-q">${w.qi+1}. ${qText.length > 90 ? qText.slice(0,90)+'…' : qText}</div>
+        <div class="wrong-item-meta">
+          <span class="tag tag-blue">${sectionNames[w.si]}</span>
+          <span class="tag tag-red">Your: ${labels[w.a]}. ${yourAns.length>30?yourAns.slice(0,30)+'…':yourAns}</span>
+          <span class="tag tag-green">✓ ${labels[w.correct]}. ${correctAns.length>30?correctAns.slice(0,30)+'…':correctAns}</span>
+        </div>`;
+      wrongEl.appendChild(div);
+    });
+    if(wrongItems.length > 50) {
+      wrongEl.innerHTML += `<div style="text-align:center;padding:12px;color:var(--muted);font-size:12px;">... and ${wrongItems.length-50} more</div>`;
+    }
+  }
+}
+
+// ── init ──
+render();
+</script>
+</body>
+</html>
